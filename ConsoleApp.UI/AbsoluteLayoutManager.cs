@@ -8,8 +8,10 @@ namespace ConsoleApp.UI
     {
         public Size Measure(IList<VisualElement> children, int widthConstraint, int heightConstraint)
         {
-            var width = widthConstraint;
-            var height = heightConstraint;
+            //var width = widthConstraint;
+            //var height = heightConstraint;
+            var width = 0;
+            var height = 0;
 
             for (var index = 0; index < children.Count; index++)
             {
@@ -18,6 +20,8 @@ namespace ConsoleApp.UI
 
                 width = Math.Max(width, size.Width);
                 height = Math.Max(height, size.Height);
+                //width = Math.Min(width, size.Width);
+                //height = Math.Min(height, size.Height);
             }
 
             return new Size(width, height);

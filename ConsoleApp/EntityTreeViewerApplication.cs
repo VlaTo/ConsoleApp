@@ -20,7 +20,7 @@ namespace ConsoleApp
 
             connectMenuItem = new MenuItem
             {
-                Title = "~Connect..."
+                Title = "~Connect to GameServer..."
             };
             exitMenuItem = new MenuItem
             {
@@ -35,7 +35,22 @@ namespace ConsoleApp
                 Title = "~Commands",
                 Items =
                 {
+                    new MenuItem
+                    {
+                        Title = "Open ~File...",
+                    },
+                    new MenuItem
+                    {
+                        Title = "Open ~Dump...",
+                    },
+                    new MenuDelimiter(),
                     connectMenuItem,
+                    new MenuItem
+                    {
+                        Title = "Di~sconnect",
+                        IsEnabled = false
+                    },
+                    new MenuDelimiter(),
                     exitMenuItem
                 }
             });
@@ -49,7 +64,8 @@ namespace ConsoleApp
             });
             MenuBar.Items.Add(new MenuItem
             {
-                Title = "~Macro"
+                Title = "~Macro",
+                IsEnabled = false
             });
             MenuBar.Items.Add(new MenuItem
             {
@@ -71,7 +87,7 @@ namespace ConsoleApp
                 Background = Color.DarkBlue,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
-                Left = 90,
+                Left = 7,
                 Top = 0,
                 Width = 20,
                 Height = 20
@@ -81,9 +97,13 @@ namespace ConsoleApp
             {
                 Title = "Tree View",
                 Background = Color.DarkBlue,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                Margin = new Thickness(8)
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                //Margin = new Thickness(8)
+                Left = 2,
+                Top = 1,
+                Width = 80,
+                Height = 40
             };
 
             Background.Children.Add(window);

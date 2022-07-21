@@ -1,5 +1,6 @@
 ﻿using SadConsole;
 using System;
+using SadRogue.Primitives;
 
 namespace ConsoleApp.UI.Controls
 {
@@ -23,14 +24,20 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
-        public override void Render(ICellSurface surface, TimeSpan elapsed)
+        public override void Invalidate()
         {
             ;
         }
 
-        public override void Invalidate()
+        protected override void PreRender(ICellSurface surface)
         {
-            ;
+            var rectangle = new Rectangle(0, 0, Bounds.Width, Bounds.Height);
+            surface.Fill(rectangle, background: Background);
+        }
+
+        protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
+        {
+            base.RenderMain(surface, elapsed);
         }
 
         protected virtual void OnTextChanged()

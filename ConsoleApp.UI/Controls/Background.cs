@@ -1,6 +1,7 @@
 ﻿using SadConsole;
 using SadConsole.Input;
 using System;
+using System.Drawing;
 using Keys = SadConsole.Input.Keys;
 using Rectangle = SadRogue.Primitives.Rectangle;
 
@@ -38,7 +39,7 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
-        public override void Render(ICellSurface surface, TimeSpan elapsed)
+        /*public override void Render(ICellSurface surface, TimeSpan elapsed)
         {
             if (IsDirty)
             {
@@ -56,11 +57,11 @@ namespace ConsoleApp.UI.Controls
                         cell.Background = Background;
                         cell.Foreground = Foreground;
                     }
-                }*/
+                }#1#
             }
 
             base.Render(surface, elapsed);
-        }
+        }*/
 
         public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
         {
@@ -70,6 +71,20 @@ namespace ConsoleApp.UI.Controls
             }
 
             return base.HandleKeyPressed(key, modificators);
+        }
+
+        protected override void PreRender(ICellSurface surface)
+        {
+            if (false == IsDirty)
+            {
+                return;
+            }
+
+            var rectangle = new Rectangle(0, 0, Bounds.Width, Bounds.Height);
+
+            base.PreRender(surface);
+
+            RenderSurface.Fill(rectangle, Foreground, Background, Glyph);
         }
 
         private static void OnGlyphPropertyChanged(BindableObject sender, object newvalue, object oldvalue)

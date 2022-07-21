@@ -1,4 +1,6 @@
-﻿using ConsoleApp.UI.Controls;
+﻿using System;
+using System.Collections.Generic;
+using ConsoleApp.UI.Controls;
 
 namespace ConsoleApp.UI
 {
@@ -19,18 +21,35 @@ namespace ConsoleApp.UI
             get;
         }
 
+        public IList<Window> Windows
+        {
+            get;
+        }
+
         public DialogManager(Screen screen)
         {
             Screen = screen;
+            Windows = new ItemsList<Window>(OnWindowsListChanged);
         }
 
-        public void ShowModal(Popover popover)
+        static DialogManager()
+        {
+            BackgroundShadeFactorProperty = BindableProperty.Create(
+                nameof(BackgroundShadeFactor),
+                typeof(float),
+                typeof(DialogManager),
+                defaultValue: Single.NaN,
+                propertyChanged: OnBackgroundShadeFactorPropertyChanged
+            );
+        }
+
+        public void ShowModal(Window window)
         {
             if (null == overlay)
             {
                 overlay = new Overlay
                 {
-                    //BackgroundShadeFactor = 0.3f,
+                    BackgroundShadeFactor = BackgroundShadeFactor,
                     VerticalAlignment = VerticalAlignment.Stretch,
                     HorizontalAlignment = HorizontalAlignment.Stretch
                 };
@@ -38,7 +57,23 @@ namespace ConsoleApp.UI
                 Screen.Children.Add(overlay);
             }
 
-            overlay.Children.Add(popover);
+            Windows.Add(window);
+            overlay.Children.Add(window);
+        }
+
+        protected virtual void OnBackgroundShadeFactorChanged()
+        {
+            ;
+        }
+
+        private void OnWindowsListChanged(ItemsList<Window>.ItemsListChangedEventArgs e)
+        {
+            ;
+        }
+
+        private static void OnBackgroundShadeFactorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((DialogManager)sender).OnBackgroundShadeFactorChanged();
         }
     }
 }

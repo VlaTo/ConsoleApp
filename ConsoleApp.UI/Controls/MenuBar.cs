@@ -2,39 +2,47 @@
 using SadConsole.Input;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using Color = SadRogue.Primitives.Color;
 using Keys = SadConsole.Input.Keys;
 using Rectangle = SadRogue.Primitives.Rectangle;
 
 namespace ConsoleApp.UI.Controls
 {
-    public class MenuBar : VisualElement
+    public class MenuBar : Menu
     {
-        public static readonly BindableProperty SelectionBackgroundProperty;
-        public static readonly BindableProperty SelectionForegroundProperty;
-        public static readonly BindableProperty HintColorProperty;
+        //public static readonly BindableProperty SelectionBackgroundProperty;
+        //public static readonly BindableProperty SelectionForegroundProperty;
+        //public static readonly BindableProperty HintColorProperty;
+        //public static readonly BindableProperty DisabledColorProperty;
         
-        private int selectedIndex;
+        //private int selectedIndex;
 
-        public Color SelectionBackground
+        /*public Color SelectionBackground
         {
             get => (Color)GetValue(SelectionBackgroundProperty);
             set => SetValue(SelectionBackgroundProperty, value);
-        }
+        }*/
 
-        public Color SelectionForeground
+        /*public Color SelectionForeground
         {
             get => (Color)GetValue(SelectionForegroundProperty);
             set => SetValue(SelectionForegroundProperty, value);
-        }
+        }*/
 
-        public Color HintColor
+        /*public Color HintColor
         {
             get => (Color)GetValue(HintColorProperty);
             set => SetValue(HintColorProperty, value);
-        }
+        }*/
 
-        public MenuItem SelectedItem
+        /*public Color DisabledColor
+        {
+            get => (Color)GetValue(DisabledColorProperty);
+            set => SetValue(DisabledColorProperty, value);
+        }*/
+
+        /*public MenuItem SelectedItem
         {
             get
             {
@@ -43,11 +51,11 @@ namespace ConsoleApp.UI.Controls
                     return null;
                 }
 
-                return Items[selectedIndex];
+                return (MenuItem)Items[selectedIndex];
             }
-        }
+        }*/
 
-        public int SelectedIndex
+        /*public int SelectedIndex
         {
             get => selectedIndex;
             private set
@@ -58,28 +66,29 @@ namespace ConsoleApp.UI.Controls
                     Invalidate();
                 }
             }
-        }
+        }*/
 
-        public bool IsPopupOpened
+        /*public bool IsPopupOpened
         {
             get;
             private set;
-        }
+        }*/
 
-        public IList<MenuItem> Items
+        /*public IList<MenuElement> Items
         {
             get;
-        }
+        }*/
 
-        public event EventHandler OnMenuCancel;
+        //public event EventHandler OnMenuCancel;
 
         public MenuBar()
+            : base(MenuOrientation.Horizontal)
         {
-            Items = new ItemsList<MenuItem>(OnItemsListChanged);
-            selectedIndex = -1;
+            //Items = new ItemsList<MenuElement>(OnItemsListChanged);
+            //selectedIndex = -1;
         }
 
-        static MenuBar()
+        /*static MenuBar()
         {
             SelectionBackgroundProperty = BindableProperty.Create(
                 nameof(SelectionBackground),
@@ -102,29 +111,118 @@ namespace ConsoleApp.UI.Controls
                 Color.Yellow,
                 OnHintColorPropertyChanged
             );
-        }
+            DisabledColorProperty = BindableProperty.Create(
+                nameof(DisabledColor),
+                typeof(Color),
+                typeof(MenuBar),
+                defaultValue: Color.DarkGray,
+                propertyChanged: OnDisabledColorPropertyChanged
+            );
+        }*/
 
+        /*public System.Drawing.Rectangle GetItemBounds(MenuElement menuElement)
+        {
+            var origin = new Point(Padding.Left + 2, Padding.Top);
+            var height = Bounds.Height - Padding.VerticalThickness;
+
+            foreach (var item in Items)
+            {
+                if (item is MenuItem menuItem)
+                {
+                    var length = MenuItem.GetLength(menuItem.Title) + 4;
+
+                    if (ReferenceEquals(item, menuItem))
+                    {
+                        return new System.Drawing.Rectangle(origin, new Size(length, height));
+                    }
+
+                    origin.X += length;
+                }
+                else if (item is MenuDelimiter)
+                {
+                    origin.X += 2;
+                }
+            }
+
+            return System.Drawing.Rectangle.Empty;
+        }*/
+
+        /*
         public override void Render(ICellSurface surface, TimeSpan elapsed)
         {
             var rectangle = new Rectangle(0, 0, Bounds.Width, Bounds.Height);
             surface.Fill(rectangle, Color.Transparent, Background, Glyphs.Whitespace);
 
             var left = Padding.Left + 2;
+            var top = Bounds.Y + Padding.Top;
+            var height = Bounds.Height - Padding.VerticalThickness;
 
             foreach (var item in Items)
             {
-                var length = MenuItem.GetLength(item.Title);
-                var rect = new Rectangle(left, Bounds.Y, length + 4, Bounds.Height);
-                var isSelected = IsFocused && ReferenceEquals(SelectedItem, item);
+                var rect = Rectangle.Empty;
+                var background = Background;
+                var foreground = Foreground;
+
+                if (item is MenuItem menuItem)
+                {
+                    var length = MenuItem.GetLength(menuItem.Title);
+                    var isSelected = (IsFocused || IsPopupOpened) && ReferenceEquals(SelectedItem, item);
+                    
+                    background = isSelected ? SelectionBackground : Background;
+                    foreground = GetItemForegroundColor(menuItem, isSelected);
+                    rect = new Rectangle(left, top, length + 4, height);
+                    
+                    left += (length + 4);
+                }
+                else if (item is MenuDelimiter)
+                {
+                    background = Background;
+                    foreground = Color.Transparent;
+                    rect = new Rectangle(left, top, 2, height);
+
+                    left += 2;
+                }
+
+                /*var length = MenuItem.GetLength(item.Title);
+                var rect = new Rectangle(left, top, length + 4, height);
+                var isSelected = (IsFocused || IsPopupOpened) && ReferenceEquals(SelectedItem, item);
                 var background = isSelected ? SelectionBackground : Background;
-                var foreground = isSelected ? SelectionForeground : Foreground;
+                var foreground = GetItemForegroundColor(item, isSelected);#1#
 
                 item.Render(surface, rect, background, foreground, HintColor);
 
-                left += (length + 4);
+                //left += (length + 4);
             }
 
             base.Render(surface, elapsed);
+        }
+        */
+
+        protected override void RenderMenuItems(ICellSurface surface, System.Drawing.Rectangle bounds, TimeSpan elapsed)
+        {
+            var left = bounds.X + 2;
+            var top = bounds.Y;
+
+            foreach (var item in Items)
+            {
+                var rect = Rectangle.Empty;
+                var isSelected = (IsFocused || IsPopupOpened) && ReferenceEquals(SelectedItem, item);
+
+                if (item is MenuItem menuItem)
+                {
+                    var length = menuItem.TitleLength;
+
+                    rect = new Rectangle(left, top, length + 4, bounds.Height);
+                    left += (length + 4);
+                }
+                else if (item is MenuDelimiter)
+                {
+                    rect = new Rectangle(left, top, 2, bounds.Height);
+                    left += 2;
+                }
+
+                item.Render(surface, rect, isSelected);
+            }
         }
 
         public override bool HandleKeyDown(AsciiKey key, ModificatorKeys modificators)
@@ -139,6 +237,7 @@ namespace ConsoleApp.UI.Controls
             return false;
         }
 
+        /*
         public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
         {
             if (Keys.Escape == key)
@@ -190,7 +289,7 @@ namespace ConsoleApp.UI.Controls
             {
                 var selectedItem = SelectedItem;
 
-                if (null != selectedItem)
+                if (selectedItem is { IsEnabled: true, IsVisible: true })
                 {
                     selectedItem.Click();
                     return true;
@@ -199,66 +298,36 @@ namespace ConsoleApp.UI.Controls
 
             return false;
         }
+        */
 
-        private int GetPreviousIndex()
+        protected override void OnItemsListChanged(ItemsList<MenuElement>.ItemsListChangedEventArgs args)
         {
-            if (0 == Items.Count)
-            {
-                return -1;
-            }
+            base.OnItemsListChanged(args);
 
-            var index = selectedIndex - 1;
-
-            if (0 > index)
-            {
-                index = Items.Count - 1;
-            }
-
-            return index;
-        }
-
-        private int GetNextIndex()
-        {
-            if (0 == Items.Count)
-            {
-                return -1;
-            }
-
-            var index = selectedIndex + 1;
-
-            if (Items.Count <= index)
-            {
-                index = 0;
-            }
-
-            return index;
-        }
-
-        private void OnItemsListChanged(ItemsList<MenuItem>.ItemsListChangedEventArgs args)
-        {
             switch (args.Action)
             {
                 case ItemsChangeAction.Add:
                 case ItemsChangeAction.Insert:
                 {
                     args.NewItem.Menu = this;
+                    /*args.NewItem.Parent = null;
 
                     if (0 > SelectedIndex && 0 < Items.Count)
                     {
                         SelectedIndex = 0;
-                    }
+                    }*/
 
                     break;
                 }
 
-                case ItemsChangeAction.Clear:
+                /*case ItemsChangeAction.Clear:
                 {
                     SelectedIndex = -1;
 
                     break;
-                }
+                }*/
 
-                case ItemsChangeAction.Remove:
+                /*case ItemsChangeAction.Remove:
                 {
                     if (0 > SelectedIndex)
                     {
@@ -277,19 +346,82 @@ namespace ConsoleApp.UI.Controls
                     }
 
                     break;
-                }
+                }*/
 
                 case ItemsChangeAction.Replace:
                 {
                     args.NewItem.Menu = this;
-                    args.OldItem.Menu = null;
+                    //args.NewItem.Parent = null;
+                    //args.OldItem.Menu = null;
 
                     break;
                 }
             }
         }
 
-        private void RaiseMenuCancel(EventArgs e)
+        /*private Color GetItemForegroundColor(MenuItem menuItem, bool isSelected)
+        {
+            if (menuItem.IsEnabled)
+            {
+                return isSelected ? SelectionForeground : Foreground;
+            }
+
+            return DisabledColor;
+        }*/
+
+        /*private int GetPreviousIndex()
+        {
+            if (0 == Items.Count)
+            {
+                return -1;
+            }
+
+            var position = selectedIndex;
+
+            while (true)
+            {
+                position--;
+
+                if (0 > position)
+                {
+                    position = Items.Count - 1;
+                }
+
+                if (position == selectedIndex || Items[position].IsSelectable)
+                {
+                    return position;
+                }
+            }
+        }*/
+
+        /*
+        private int GetNextIndex()
+        {
+            if (0 == Items.Count)
+            {
+                return -1;
+            }
+
+            var position = selectedIndex;
+
+            while (true)
+            {
+                position++;
+
+                if (Items.Count <= position)
+                {
+                    position = 0;
+                }
+
+                if (position == selectedIndex || Items[position].IsSelectable)
+                {
+                    return position;
+                }
+            }
+        }
+        */
+
+        /*private void RaiseMenuCancel(EventArgs e)
         {
             var handler = OnMenuCancel;
 
@@ -297,21 +429,6 @@ namespace ConsoleApp.UI.Controls
             {
                 handler.Invoke(this, e);
             }
-        }
-
-        private static void OnHintColorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
-        {
-            ((MenuBar)sender).Invalidate();
-        }
-
-        private static void OnSelectionForegroundPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
-        {
-            ((MenuBar)sender).Invalidate();
-        }
-
-        private static void OnSelectionBackgroundPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
-        {
-            ((MenuBar)sender).Invalidate();
-        }
+        }*/
     }
 }

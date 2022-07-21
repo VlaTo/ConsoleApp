@@ -1,6 +1,7 @@
 ﻿using SadConsole;
 using SadRogue.Primitives;
 using System;
+using ConsoleApp.UI.Extensions;
 
 namespace ConsoleApp.UI
 {
@@ -17,6 +18,7 @@ namespace ConsoleApp.UI
         public Overlay()
         {
             LayoutManager = new AbsoluteLayoutManager();
+            IsOpaque = false;
         }
 
         static Overlay()
@@ -30,26 +32,10 @@ namespace ConsoleApp.UI
             );
         }
 
-        public override void Render(ICellSurface surface, TimeSpan elapsed)
+        /*public override void Render(ICellSurface surface, TimeSpan elapsed)
         {
             surface.Copy(RenderSurface);
 
-            var factor = BackgroundShadeFactor;
-
-            if (false == Single.IsNaN(factor))
-            {
-                for (var line = 0; line < RenderSurface.Height; line++)
-                {
-                    for (var column = 0; column < RenderSurface.Width; column++)
-                    {
-                        var index = RenderSurface.Width * line + column;
-                        var cell = RenderSurface[index];
-
-                        cell.Background = Shade(cell.Background, factor);
-                        //cell.Foreground = Shade(cell.Foreground, 025f);
-                    }
-                }
-            }
 
             if (0 < Children.Count)
             {
@@ -57,6 +43,21 @@ namespace ConsoleApp.UI
             }
 
             RenderSurface.Copy(surface);
+        }*/
+
+        protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
+        {
+            if (IsDirty || false == IsOpaque)
+            {
+                var factor = BackgroundShadeFactor;
+
+                if (false == Single.IsNaN(factor))
+                {
+                    RenderSurface.Shade(RenderSurface.Area, backgroundFactor: factor);
+                }
+            }
+
+            base.RenderMain(surface, elapsed);
         }
 
         protected virtual void OnBackgroundShadeFactorChanged()

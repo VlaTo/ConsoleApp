@@ -1,5 +1,4 @@
 ﻿using ConsoleApp.UI.Controls;
-using System.Diagnostics;
 
 namespace ConsoleApp.UI
 {
@@ -21,8 +20,6 @@ namespace ConsoleApp.UI
         public bool FocusWindow(MoveDirection direction)
         {
             var focusedElement = owner.FocusedElement;
-
-            Debug.WriteLine("[WindowsManager] [FocusWindow] Executing");
 
             if (focusedElement is Window current)
             {

@@ -12,13 +12,20 @@ namespace ConsoleApp.UI
 
     public class VisualGroup : VisualElement
     {
+        public static readonly BindableProperty LayoutManagerProperty;
+        public static readonly BindableProperty IsOpaqueProperty;
+
         private VisualElement lastFocusedElement;
 
-        public static readonly BindableProperty LayoutManagerProperty;
-        
         public IList<VisualElement> Children
         {
             get;
+        }
+
+        public bool IsOpaque
+        {
+            get => (bool)GetValue(IsOpaqueProperty);
+            set => SetValue(IsOpaqueProperty, value);
         }
 
         public VisualElement FocusedElement
@@ -51,6 +58,13 @@ namespace ConsoleApp.UI
 
         static VisualGroup()
         {
+            IsOpaqueProperty = BindableProperty.Create(
+                nameof(IsOpaque),
+                typeof(bool),
+                typeof(VisualGroup),
+                defaultValue: true,
+                propertyChanged: OnIsOpaquePropertyChanged
+            );
             LayoutManagerProperty = BindableProperty.Create(
                 nameof(LayoutManager),
                 typeof(ILayoutManager),
@@ -97,19 +111,17 @@ namespace ConsoleApp.UI
         {
             if (false == IsMeasureValid)
             {
-                //var size = base.Measure(widthConstraint, heightConstraint);
-
                 widthConstraint -= Margin.HorizontalThickness;
                 heightConstraint -= Margin.VerticalThickness;
-                
-                widthConstraint = ResolveConstraints(widthConstraint, Width);
-                heightConstraint = ResolveConstraints(heightConstraint, Height);
+
+                widthConstraint = ResolveConstraint(widthConstraint, Width, 0);
+                heightConstraint = ResolveConstraint(heightConstraint, Height, 0);
                 
                 var sizeWithoutMargins = LayoutManager.Measure(Children, widthConstraint, heightConstraint);
 
                 DesiredSize = new Size(
-                    sizeWithoutMargins.Width, // + Margin.HorizontalThickness,
-                    sizeWithoutMargins.Height // + Margin.VerticalThickness
+                    Math.Max(sizeWithoutMargins.Width, widthConstraint),
+                    Math.Max(sizeWithoutMargins.Height, heightConstraint)
                 );
 
                 IsMeasureValid = true;
@@ -118,16 +130,25 @@ namespace ConsoleApp.UI
             return DesiredSize;
         }
 
-        public override void Render(ICellSurface surface, TimeSpan elapsed)
+        /*public override void Render(ICellSurface surface, TimeSpan elapsed)
         {
-            if (IsDirty && 0 < Children.Count)
+            var transparent = false == IsOpaque;
+
+            if (transparent)
             {
+                surface.Copy(RenderSurface);
+            }
+
+            if (IsDirty || transparent)
+            {
+                DoRender();
                 RenderChildren(elapsed);
+
                 IsDirty = false;
             }
 
             RenderSurface.Copy(surface);
-        }
+        }*/
 
         public override void Invalidate()
         {
@@ -231,6 +252,29 @@ namespace ConsoleApp.UI
         }
 
         protected virtual bool ShouldLayoutChildren() => false == Bounds.IsEmpty && IsVisible && Children.Any();
+
+        protected override void PreRender(ICellSurface surface)
+        {
+            if (false == IsOpaque)
+            {
+                surface.Copy(RenderSurface);
+            }
+        }
+
+        protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
+        {
+            if (IsDirty || false == IsOpaque)
+            {
+                RenderChildren(elapsed);
+
+                IsDirty = false;
+            }
+        }
+
+        protected override void PostRender(ICellSurface surface)
+        {
+            RenderSurface.Copy(surface);
+        }
 
         protected void RenderChildren(TimeSpan elapsed)
         {
@@ -366,6 +410,11 @@ namespace ConsoleApp.UI
             }
         }
 
+        protected virtual void OnIsOpaqueChanged()
+        {
+            Invalidate();
+        }
+
         private void OnLayoutManagerChanged()
         {
             Invalidate();
@@ -374,6 +423,11 @@ namespace ConsoleApp.UI
         private static void OnLayoutManagerPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
         {
             ((VisualGroup)sender).OnLayoutManagerChanged();
+        }
+
+        private static void OnIsOpaquePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((VisualGroup)sender).OnIsOpaqueChanged();
         }
 
         /// <summary>

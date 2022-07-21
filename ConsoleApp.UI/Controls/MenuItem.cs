@@ -5,11 +5,13 @@ using SadRogue.Primitives;
 
 namespace ConsoleApp.UI.Controls
 {
-    public class MenuItem : BindableObject
+    public class MenuItem : MenuElement
     {
         public static readonly BindableProperty TitleProperty;
-        public static readonly BindableProperty MenuProperty;
-        public static readonly BindableProperty ParentProperty;
+        //public static readonly BindableProperty MenuProperty;
+        //public static readonly BindableProperty ParentProperty;
+        //public static readonly BindableProperty IsEnabledProperty;
+        public static readonly BindableProperty IsVisibleProperty;
 
         public string Title
         {
@@ -17,34 +19,78 @@ namespace ConsoleApp.UI.Controls
             set => SetValue(TitleProperty, value);
         }
 
-        public MenuBar Menu
+        /*public MenuBar Menu
         {
             get => (MenuBar)GetValue(MenuProperty);
             set => SetValue(MenuProperty, value);
-        }
+        }*/
 
-        public MenuItem Parent
+        /*public MenuItem Parent
         {
             get => (MenuItem)GetValue(ParentProperty);
             set => SetValue(ParentProperty, value);
+        }*/
+
+        /*public bool IsEnabled
+        {
+            get => (bool)GetValue(IsEnabledProperty);
+            set => SetValue(IsEnabledProperty, value);
+        }*/
+
+        public bool IsVisible
+        {
+            get => (bool)GetValue(IsVisibleProperty);
+            set => SetValue(IsVisibleProperty, value);
         }
 
-        public IList<MenuItem> Items
+        public IList<MenuElement> Items
         {
             get;
         }
 
-        public bool IsPopupOpen
+        /*public bool IsPopupOpen
         {
             get;
             private set;
+        }*/
+
+        /*public System.Drawing.Rectangle Bounds
+        {
+            get
+            {
+
+            }
+        }*/
+
+        public override bool IsSelectable => IsVisible && IsEnabled;
+
+        public int TitleLength
+        {
+            get
+            {
+                var title = Title;
+
+                if (String.IsNullOrEmpty(title))
+                {
+                    return 0;
+                }
+
+                var length = title.Length;
+
+                if (title.Contains('~'))
+                {
+                    length--;
+                }
+
+                return length;
+            }
         }
 
         public event EventHandler OnClick;
 
         public MenuItem()
         {
-            Items = new ItemsList<MenuItem>(OnItemsListChanged);
+            Items = new ItemsList<MenuElement>(OnItemsListChanged);
         }
 
         static MenuItem()
@@ -56,26 +102,39 @@ namespace ConsoleApp.UI.Controls
                 string.Empty,
                 OnTitlePropertyChanged
             );
-            MenuProperty = BindableProperty.Create(
+            /*MenuProperty = BindableProperty.Create(
                 nameof(Menu),
                 typeof(MenuBar),
                 typeof(MenuItem),
                 defaultValue: null,
                 propertyChanged: OnMenuPropertyChanged
-            );
-            ParentProperty = BindableProperty.Create(
+            );*/
+            /*ParentProperty = BindableProperty.Create(
                 nameof(Parent),
                 typeof(MenuItem),
                 typeof(MenuItem),
                 defaultValue: null,
                 propertyChanged: OnParentPropertyChanged
+            );*/
+            /*IsEnabledProperty = BindableProperty.Create(
+                nameof(IsEnabled),
+                typeof(bool),
+                typeof(MenuItem),
+                defaultValue: true,
+                propertyChanged: OnIsEnabledPropertyChanged
+            );*/
+            IsVisibleProperty = BindableProperty.Create(
+                nameof(IsVisible),
+                typeof(bool),
+                typeof(MenuItem),
+                defaultValue: true,
+                propertyChanged: OnIsVisiblePropertyChanged
             );
         }
 
-        public void Render(ICellSurface surface, Rectangle rect, Color background, Color foreground, Color hint)
+        public override void Render(ICellSurface surface, Rectangle rectangle, bool isSelected /*, Color background, Color foreground, Color hint*/)
         {
-            var top = rect.Height >> 1;
-            var left = rect.X + 2;
+            var left = rectangle.X + 2;
             var title = Title;
             var hintIndex = title.IndexOf('~');
             var hasHint = 0 <= hintIndex;
@@ -85,12 +144,15 @@ namespace ConsoleApp.UI.Controls
                 title = title.Remove(hintIndex, 1);
             }
 
-            surface.Fill(rect, Color.Transparent, background);
-            surface.Print(left, top, title, foreground);
+            var foreground = GetForegroundColor(isSelected);
+            var background = isSelected ? Menu.SelectionBackground : Menu.Background;
+
+            surface.Fill(rectangle, Color.Transparent, background);
+            surface.Print(left, rectangle.Y, title, foreground);
 
             if (hasHint)
             {
-                surface[left + hintIndex, top].Foreground = hint;
+                surface[left + hintIndex, rectangle.Y].Foreground = Menu.HintColor;
             }
         }
 
@@ -98,17 +160,27 @@ namespace ConsoleApp.UI.Controls
         {
             if (0 == Items.Count)
             {
-                var handler = OnClick;
+                RaiseOnClick();
 
-                if (null != handler)
+                if (null != Menu)
                 {
-                    handler.Invoke(this, EventArgs.Empty);
+                    Menu.NotifyOnClick(this);
                 }
 
                 return;
             }
 
-            IsPopupOpen = true;
+            //IsPopupOpen = true;
+        }
+
+        private void RaiseOnClick()
+        {
+            var handler = OnClick;
+
+            if (null != handler)
+            {
+                handler.Invoke(this, EventArgs.Empty);
+            }
         }
 
         public void ShowItems()
@@ -118,12 +190,26 @@ namespace ConsoleApp.UI.Controls
                 return;
             }
 
-            var bounds = Menu.Bounds;
-            
-            Popover.Show();
+            /*var origin= Menu.GetAbsolutePosition();
+            var rect = Menu.GetItemBounds(this);
+
+            rect.X += origin.X;
+            rect.Y += origin.Y;*/
+            var anchor = new System.Drawing.Rectangle(2, 0, TitleLength, 1);
+            MenuDropDown.Show(anchor, Items);
         }
 
-        public static int GetLength(string title)
+        /*public override System.Drawing.Rectangle GetBounds()
+        {
+            if (null != Menu && null == Parent)
+            {
+                return Menu.GetItemBounds(this);
+            }
+
+            return Parent.GetItemBounds(this);
+        }*/
+
+        /*public static int GetLength(string title)
         {
             if (string.IsNullOrEmpty(title))
             {
@@ -138,22 +224,9 @@ namespace ConsoleApp.UI.Controls
             }
 
             return length;
-        }
+        }*/
 
-        private string StripTitle()
-        {
-            var title = Title;
-            var index = title.IndexOf('~');
-
-            if (0 > index)
-            {
-                return title;
-            }
-
-            return title.Remove(index, 1);
-        }
-
-        protected virtual void OnMenuChanged()
+        protected override void OnMenuChanged()
         {
             for (var index = 0; index < Items.Count; index++)
             {
@@ -161,12 +234,22 @@ namespace ConsoleApp.UI.Controls
             }
         }
 
-        protected virtual void OnParentChanged()
+        protected virtual void OnIsVisibleChanged()
         {
             ;
         }
 
-        private void OnItemsListChanged(ItemsList<MenuItem>.ItemsListChangedEventArgs args)
+        private System.Drawing.Rectangle GetItemBounds(MenuItem menuItem)
+        {
+            for (var index = 0; index < Items.Count; index++)
+            {
+                
+            }
+
+            return System.Drawing.Rectangle.Empty;
+        }
+
+        private void OnItemsListChanged(ItemsList<MenuElement>.ItemsListChangedEventArgs args)
         {
             switch (args.Action)
             {
@@ -204,14 +287,14 @@ namespace ConsoleApp.UI.Controls
             ;
         }
 
-        private static void OnMenuPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        /*private static void OnIsEnabledPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
         {
-            ((MenuItem)sender).OnMenuChanged();
-        }
+            ((MenuItem)sender).OnIsEnabledChanged();
+        }*/
 
-        private static void OnParentPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        private static void OnIsVisiblePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
         {
-            ((MenuItem)sender).OnParentChanged();
+            ((MenuItem)sender).OnIsVisibleChanged();
         }
     }
 }

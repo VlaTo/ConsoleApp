@@ -44,14 +44,14 @@ namespace ConsoleApp.UI.Controls
             base.Update(elapsed);
         }
 
-        public override void Render(ICellSurface surface, TimeSpan elapsed)
+        protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
         {
             var rectangle = new Rectangle(0, 0, Bounds.Width, Bounds.Height);
             
             surface.Fill(rectangle, Foreground, Background, Glyphs.Whitespace);
             RenderTime(surface, rectangle, Clock);
 
-            base.Render(surface, elapsed);
+            base.RenderMain(surface, elapsed);
         }
 
         protected virtual void OnClockChanged()

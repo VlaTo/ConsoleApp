@@ -11,18 +11,18 @@ namespace ConsoleApp.UI
         {
         }
 
-        public static void Show()
+        public static void Show(Rectangle rectangle)
         {
             var application = ConsoleApplication.Instance;
             var dialogManager = application.DialogManager;
             var popover = new Popover
             {
-                Background = Color.AnsiGreen,
+                Background = Color.DarkCyan,
                 Foreground = Color.White,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                //Left = 5,
-                //Top = 5,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Left = rectangle.Left,
+                Top = rectangle.Top + 1,
                 Width = 30,
                 Height = 10
             };

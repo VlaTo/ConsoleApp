@@ -50,8 +50,8 @@ namespace ConsoleApp.UI.Controls
 
         public void Start()
         {
-            SadConsole.Game.Create(Width, Height);
-            SadConsole.Game.Instance.OnStart = OnStart;
+            Game.Create(Width, Height);
+            Game.Instance.OnStart = OnStart;
         }
 
         public override void Render(ICellSurface surface, TimeSpan elapsed)
@@ -95,9 +95,9 @@ namespace ConsoleApp.UI.Controls
 
             Settings.ResizeMode = Settings.WindowResizeOptions.None;
 
-            SadConsole.Game.Instance.Screen = container;
-            SadConsole.Game.Instance.DestroyDefaultStartingConsole();
-            SadConsole.Game.Instance.MonoGameInstance.WindowResized += OnResizeConsole;
+            Game.Instance.Screen = container;
+            Game.Instance.DestroyDefaultStartingConsole();
+            Game.Instance.MonoGameInstance.WindowResized += OnResizeConsole;
 
             UpdateWindowTitle();
 

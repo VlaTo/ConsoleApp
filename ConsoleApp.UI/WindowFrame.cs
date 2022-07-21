@@ -21,6 +21,11 @@ namespace ConsoleApp.UI
             get;
         }
 
+        public Thickness Thickness =>
+            WindowFrameType.None == Window.FrameType
+                ? Thickness.Empty
+                : new Thickness(1, 1);
+
         public WindowFrame(Window window)
         {
             Window = window;
@@ -30,27 +35,34 @@ namespace ConsoleApp.UI
         {
             //SadConsole.Shapes.Box box = SadConsole.Shapes.Box.GetDefaultBox();
             //var rect = new Rectangle(0, 0, window.Width, window.Height);
-            var rect = new Rectangle(0, 0, Window.Bounds.Width, Window.Bounds.Height);
+            //var rect = new Rectangle(0, 0, Window.Bounds.Width, Window.Bounds.Height);
+            var rectangle = new Rectangle(
+                0,
+                0,
+                Window.Bounds.Width - Window.Shadow.Width,
+                Window.Bounds.Height - Window.Shadow.Height
+            );
+
             var foreground = Window.IsFocused ? Color.White : Color.DarkGray;
             var border = new ColoredGlyph(foreground, Window.Background);
             var background = new ColoredGlyph(Color.Transparent, Window.Background);
 
             if (WindowFrameType.None == Window.FrameType)
             {
-                surface.Fill(rect, Color.Transparent, Window.Background, Glyphs.Whitespace);
+                surface.Fill(rectangle, Color.Transparent, Window.Background, Glyphs.Whitespace);
                 return;
             }
 
             var connectedLineStyle = GetConnectedLineStyle(Window.FrameType);
 
-            var temp = new ShapeParameters(
+            var options = new ShapeParameters(
                 true,
                 border,
                 false,
                 false,
                 false,
                 true,
-                true,
+                false,
                 background,
                 false,
                 false,
@@ -60,7 +72,7 @@ namespace ConsoleApp.UI
                 ColoredGlyph.CreateArray(8)
             );
 
-            surface.DrawBox(rect, temp);
+            surface.DrawBox(rectangle, options);
 
             if (String.IsNullOrEmpty(Window.Title))
             {

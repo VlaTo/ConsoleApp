@@ -1,6 +1,9 @@
 ﻿using SadConsole;
-using SadRogue.Primitives;
 using System;
+using System.Drawing;
+using ConsoleApp.UI.Extensions;
+using SadConsole.UI;
+using Rectangle = SadRogue.Primitives.Rectangle;
 
 namespace ConsoleApp.UI.Controls
 {
@@ -13,6 +16,9 @@ namespace ConsoleApp.UI.Controls
 
     public class Window : VisualGroup
     {
+        public const float ShadowBackgroundShadeFactor = 0.45f;
+        public const float ShadowForegroundShadeFactor = 0.15f;
+
         public static readonly BindableProperty FrameTypeProperty;
         public static readonly BindableProperty TitleProperty;
 
@@ -28,14 +34,21 @@ namespace ConsoleApp.UI.Controls
             set => SetValue(TitleProperty, value);
         }
 
-        public WindowFrame Frame
+        protected WindowFrame Frame
+        {
+            get;
+        }
+
+        internal Size Shadow
         {
             get;
         }
 
         public Window()
         {
+            IsOpaque = false;
             Frame = new WindowFrame(this);
+            Shadow = new Size(2, 1);
         }
 
         static Window()
@@ -55,27 +68,125 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
-        public override void Render(ICellSurface surface, TimeSpan elapsed)
+        /*public override void Render(ICellSurface surface, TimeSpan elapsed)
         {
-            if (IsDirty)
+            var transparent = false == IsOpaque;
+            
+            if (transparent)
             {
-                var rectangle = new Rectangle(0, 0, Bounds.Width, Bounds.Height);
-
-                RenderSurface.Fill(rectangle, Foreground, Background, Glyphs.Whitespace);
-                Frame.Render(RenderSurface);
+                surface.Copy(RenderSurface);
             }
 
-            base.Render(surface, elapsed);
+            if (false == Shadow.IsEmpty)
+            {
+                var right = new Rectangle(
+                    Bounds.Width - Shadow.Width,
+                    Shadow.Height,
+                    Bounds.Width,
+                    Bounds.Height
+                );
+
+                var bottom = new Rectangle(
+                    Shadow.Width,
+                    Bounds.Height - Shadow.Height,
+                    Bounds.Width - (Shadow.Width * 2),
+                    Bounds.Height
+                );
+
+                RenderSurface.Shade(right, ShadowBackgroundShadeFactor, ShadowForegroundShadeFactor);
+                RenderSurface.Shade(bottom, ShadowBackgroundShadeFactor, ShadowForegroundShadeFactor);
+            }
+
+            if (IsDirty || transparent)
+            {
+                var frameThickness = Frame.Thickness;
+                var rectangle = new Rectangle(
+                    frameThickness.Left,
+                    frameThickness.Top,
+                    Bounds.Width - frameThickness.HorizontalThickness - Shadow.Width,
+                    Bounds.Height - frameThickness.VerticalThickness - Shadow.Height
+                );
+
+                Frame.Render(RenderSurface);
+                RenderSurface.Fill(rectangle, Foreground, Background, Glyphs.Whitespace);
+
+                RenderChildren(elapsed);
+
+                IsDirty = false;
+            }
+
+            RenderSurface.Copy(surface);
+        }*/
+
+        /*public override Size Measure(int widthConstraint, int heightConstraint)
+        {
+            if (false == IsMeasureValid)
+            {
+                widthConstraint -= Margin.HorizontalThickness;
+                heightConstraint -= Margin.VerticalThickness;
+
+                widthConstraint = ResolveConstraint(widthConstraint, Width, Shadow.Width);
+                heightConstraint = ResolveConstraint(heightConstraint, Height, Shadow.Height);
+                
+                var sizeWithoutMargins = LayoutManager.Measure(Children, widthConstraint, heightConstraint);
+
+                DesiredSize = new Size(
+                    sizeWithoutMargins.Width,
+                    sizeWithoutMargins.Height
+                );
+
+                IsMeasureValid = true;
+            }
+
+            return DesiredSize;
+        }*/
+
+        protected override void PreRender(ICellSurface surface)
+        {
+            base.PreRender(surface);
+
+            if (false == Shadow.IsEmpty)
+            {
+                var right = new Rectangle(
+                    Bounds.Width - Shadow.Width,
+                    Shadow.Height,
+                    Bounds.Width,
+                    Bounds.Height
+                );
+
+                var bottom = new Rectangle(
+                    Shadow.Width,
+                    Bounds.Height - Shadow.Height,
+                    Bounds.Width - (Shadow.Width * 2),
+                    Bounds.Height
+                );
+
+                RenderSurface.Shade(right, ShadowBackgroundShadeFactor, ShadowForegroundShadeFactor);
+                RenderSurface.Shade(bottom, ShadowBackgroundShadeFactor, ShadowForegroundShadeFactor);
+            }
         }
 
-        public override void Enter()
+        protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
         {
-            base.Enter();
-        }
+            if (false == IsDirty && IsOpaque)
+            {
+                return;
+            }
 
-        public override void Leave()
-        {
-            base.Leave();
+            var frameThickness = Frame.Thickness;
+            var rectangle = new Rectangle(
+                frameThickness.Left,
+                frameThickness.Top,
+                Bounds.Width - frameThickness.HorizontalThickness - Shadow.Width,
+                Bounds.Height - frameThickness.VerticalThickness - Shadow.Height
+            );
+
+            Frame.Render(RenderSurface);
+            RenderSurface.Fill(rectangle, Foreground, Background, Glyphs.Whitespace);
+
+            RenderChildren(elapsed);
+
+            IsDirty = false;
         }
 
         protected override void OnChildAdded(VisualElement view)

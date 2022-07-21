@@ -46,7 +46,12 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
-        public override void Render(ICellSurface surface, TimeSpan elapsed)
+        public override void Update(TimeSpan elapsed)
+        {
+            ;
+        }
+
+        protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
         {
             //surface.Fill(new Rectangle(0, 0, Width, Height), Foreground, Background, '\x20');
             var rectangle = Bounds.ToRectangle();
@@ -61,11 +66,8 @@ namespace ConsoleApp.UI.Controls
             }
 
             surface.Print(Padding.Left, Padding.Top, text, Foreground, Background);
-        }
 
-        public override void Update(TimeSpan elapsed)
-        {
-            ;
+            base.RenderMain(surface, elapsed);
         }
 
         protected virtual void OnTextChanged()

@@ -389,6 +389,10 @@ namespace ConsoleApp.UI
 
         public virtual void Render(ICellSurface surface, TimeSpan elapsed)
         {
+            PreRender(surface);
+            RenderMain(surface, elapsed);
+            PostRender(surface);
+
             IsDirty = false;
         }
 
@@ -429,17 +433,28 @@ namespace ConsoleApp.UI
             }
         }
 
+        public Point GetAbsolutePosition()
+        {
+            var position = Bounds.Location;
+            var element = Parent;
+
+            while (null != element)
+            {
+                var location = element.Bounds.Location;
+
+                position.X += location.X;
+                position.Y += location.Y;
+                //position = new Point(position.X + location.X, position.Y + location.Y);
+                element = element.Parent;
+            }
+
+            return position;
+        }
+
         protected Rectangle GetAvailableBounds(Rectangle bounds)
         {
             var left = CalculateLeft(bounds.X, bounds.Width);
-            
-
-
-
-
-
-
-            var top = 0 > Top ? bounds.Y : Top;
+            var top = CalculateTop(bounds.Top, bounds.Height);
 
 
             var width = Math.Max(0, bounds.Width - Padding.HorizontalThickness);
@@ -487,6 +502,42 @@ namespace ConsoleApp.UI
             return value;
         }
 
+        protected int CalculateTop(int top, int height)
+        {
+            var value = -1;
+
+            switch (VerticalAlignment)
+            {
+                case VerticalAlignment.Top:
+                {
+                    value = 0 > Top ? top : Top;
+                    break;
+                }
+
+                case VerticalAlignment.Center:
+                {
+                    value = (height - (DesiredSize.Height + Margin.VerticalThickness)) >> 1;
+                    break;
+                }
+
+                case VerticalAlignment.Stretch:
+                {
+                    value = top;
+                    break;
+                }
+
+                case VerticalAlignment.Bottom:
+                {
+                    value = height - (DesiredSize.Height + Margin.VerticalThickness);
+                    break;
+                }
+            }
+
+            value = Math.Max(value, top);
+
+            return value;
+        }
+
         protected Size GetDesiredSize(int widthConstraint, int heightConstraint)
         {
             /*_ = frameworkElement ?? throw new ArgumentNullException(nameof(frameworkElement));
@@ -501,8 +552,8 @@ namespace ConsoleApp.UI
             heightConstraint -= Margin.VerticalThickness;
 
             // Determine whether the external constraints or the requested size values will determine the measurements
-            widthConstraint = ResolveConstraints(widthConstraint, Width);
-            heightConstraint = ResolveConstraints(heightConstraint, Height);
+            widthConstraint = ResolveConstraint(widthConstraint, Width, 0);
+            heightConstraint = ResolveConstraint(heightConstraint, Height, 0);
             
             // Ask the handler to do the actual measuring								
             //var measureWithMargins = frameworkElement.Handler.GetDesiredSize(widthConstraint, heightConstraint);
@@ -513,8 +564,8 @@ namespace ConsoleApp.UI
             //    measureWithMargins.Height + margin.VerticalThickness
             //);
             return new Size(
-                widthConstraint + Margin.HorizontalThickness,
-                heightConstraint + Margin.VerticalThickness
+                widthConstraint/* + Margin.HorizontalThickness*/,
+                heightConstraint/* + Margin.VerticalThickness*/
             );
 
             //return new Size(widthConstraint, heightConstraint);
@@ -692,14 +743,29 @@ namespace ConsoleApp.UI
             return req;
         }*/
 
-        protected int ResolveConstraints(int value, int constraint)
+        protected int ResolveConstraint(int value, int constraint, int extent)
         {
             if (0 > constraint)
             {
                 return value;
             }
 
-            return Math.Min(value, constraint);
+            return Math.Min(value, constraint + extent);
+        }
+
+        protected virtual void PreRender(ICellSurface surface)
+        {
+
+        }
+        
+        protected virtual void RenderMain(ICellSurface surface, TimeSpan elapsed)
+        {
+
+        }
+
+        protected virtual void PostRender(ICellSurface surface)
+        {
+
         }
 
         protected virtual void DoParentChanged()

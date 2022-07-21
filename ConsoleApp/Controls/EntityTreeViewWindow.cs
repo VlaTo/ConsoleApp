@@ -1,4 +1,5 @@
-﻿using ConsoleApp.UI.Controls;
+﻿using ConsoleApp.UI;
+using ConsoleApp.UI.Controls;
 using SadRogue.Primitives;
 
 namespace ConsoleApp.Controls
@@ -27,9 +28,11 @@ namespace ConsoleApp.Controls
             {
                 Foreground = Color.White,
                 Background = Color.Transparent,
-                Left = 2,
-                Top = 5,
-                Width = 36,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Left = 3,
+                Top = 2,
+                Width = 72,
                 Height = 1
             };
 
