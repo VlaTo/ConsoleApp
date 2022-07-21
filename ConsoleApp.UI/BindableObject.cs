@@ -43,6 +43,25 @@ namespace ConsoleApp.UI
             property.RaisePropertyChanged(this, value, existing);
         }
 
+        public void SetBinding(BindableProperty property, Binding binding)
+        {
+            if (null == property)
+            {
+                throw new Exception();
+            }
+
+            var index = FindPropertyIndex(property);
+
+            if (0 > index)
+            {
+                return ;
+            }
+
+            var holder = bindableProperties[index];
+
+            holder.
+        }
+
         public object GetValue(BindableProperty property)
         {
             if (null == property)

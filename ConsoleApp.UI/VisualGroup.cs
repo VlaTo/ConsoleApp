@@ -94,7 +94,7 @@ namespace ConsoleApp.UI
                 return;
             }
 
-            base.Arrange(bounds);
+            Bounds = GetAvailableBounds(bounds);
 
             var rectangle = new Rectangle(Point.Empty, Bounds.Size);
 
@@ -102,8 +102,9 @@ namespace ConsoleApp.UI
 
             var width = rectangle.Width;
             var height = rectangle.Height;
-            
+
             RenderSurface.Resize(width, height, true);
+
             IsArrangeValid = true;
         }
 

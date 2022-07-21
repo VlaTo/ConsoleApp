@@ -101,7 +101,7 @@ namespace ConsoleApp
                 VerticalAlignment = VerticalAlignment.Top,
                 //Margin = new Thickness(8)
                 Left = 2,
-                Top = 1,
+                Top = 2,
                 Width = 80,
                 Height = 40
             };

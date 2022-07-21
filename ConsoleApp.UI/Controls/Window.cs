@@ -1,8 +1,7 @@
-﻿using SadConsole;
+﻿using ConsoleApp.UI.Extensions;
+using SadConsole;
 using System;
 using System.Drawing;
-using ConsoleApp.UI.Extensions;
-using SadConsole.UI;
 using Rectangle = SadRogue.Primitives.Rectangle;
 
 namespace ConsoleApp.UI.Controls
@@ -55,91 +54,70 @@ namespace ConsoleApp.UI.Controls
         {
             FrameTypeProperty = BindableProperty.Create(
                 nameof(FrameType),
-                typeof(WindowFrameType),
-                typeof(Window),
-                WindowFrameType.Thick,
-                OnFrameTypePropertyChanged
+                propertyType: typeof(WindowFrameType),
+                ownerType: typeof(Window),
+                defaultValue: WindowFrameType.Thick,
+                propertyChanged: OnFrameTypePropertyChanged
             );
             TitleProperty = BindableProperty.Create(
                 nameof(Title),
-                typeof(string),
-                typeof(Window),
+                propertyType: typeof(string),
+                ownerType: typeof(Window),
                 propertyChanged: OnTitlePropertyChanged
             );
         }
-
-        /*public override void Render(ICellSurface surface, TimeSpan elapsed)
-        {
-            var transparent = false == IsOpaque;
-            
-            if (transparent)
-            {
-                surface.Copy(RenderSurface);
-            }
-
-            if (false == Shadow.IsEmpty)
-            {
-                var right = new Rectangle(
-                    Bounds.Width - Shadow.Width,
-                    Shadow.Height,
-                    Bounds.Width,
-                    Bounds.Height
-                );
-
-                var bottom = new Rectangle(
-                    Shadow.Width,
-                    Bounds.Height - Shadow.Height,
-                    Bounds.Width - (Shadow.Width * 2),
-                    Bounds.Height
-                );
-
-                RenderSurface.Shade(right, ShadowBackgroundShadeFactor, ShadowForegroundShadeFactor);
-                RenderSurface.Shade(bottom, ShadowBackgroundShadeFactor, ShadowForegroundShadeFactor);
-            }
-
-            if (IsDirty || transparent)
-            {
-                var frameThickness = Frame.Thickness;
-                var rectangle = new Rectangle(
-                    frameThickness.Left,
-                    frameThickness.Top,
-                    Bounds.Width - frameThickness.HorizontalThickness - Shadow.Width,
-                    Bounds.Height - frameThickness.VerticalThickness - Shadow.Height
-                );
-
-                Frame.Render(RenderSurface);
-                RenderSurface.Fill(rectangle, Foreground, Background, Glyphs.Whitespace);
-
-                RenderChildren(elapsed);
-
-                IsDirty = false;
-            }
-
-            RenderSurface.Copy(surface);
-        }*/
-
-        /*public override Size Measure(int widthConstraint, int heightConstraint)
+        public override Size Measure(int widthConstraint, int heightConstraint)
         {
             if (false == IsMeasureValid)
             {
+                var thickness = Frame.Thickness;
+
                 widthConstraint -= Margin.HorizontalThickness;
                 heightConstraint -= Margin.VerticalThickness;
 
                 widthConstraint = ResolveConstraint(widthConstraint, Width, Shadow.Width);
                 heightConstraint = ResolveConstraint(heightConstraint, Height, Shadow.Height);
-                
-                var sizeWithoutMargins = LayoutManager.Measure(Children, widthConstraint, heightConstraint);
+
+                var width = widthConstraint - thickness.HorizontalThickness;
+                var height = heightConstraint - thickness.VerticalThickness;
+                var childrenSize = LayoutManager.Measure(Children, width, height);
 
                 DesiredSize = new Size(
-                    sizeWithoutMargins.Width,
-                    sizeWithoutMargins.Height
+                    Math.Max(childrenSize.Width, widthConstraint),
+                    Math.Max(childrenSize.Height, heightConstraint)
                 );
 
                 IsMeasureValid = true;
             }
 
             return DesiredSize;
-        }*/
+        }
+
+        public override void Arrange(System.Drawing.Rectangle bounds)
+        {
+            if (!IsMeasureValid)
+            {
+                return;
+            }
+
+            if (IsArrangeValid)
+            {
+                return;
+            }
+
+            Bounds = GetAvailableBounds(bounds);
+
+            var thickness = Frame.Thickness;
+            var rectangle = new System.Drawing.Rectangle(thickness.Origin, Bounds.Size - (thickness.Size + Shadow));
+
+            LayoutManager.Arrange(Children, rectangle);
+
+            var width = Bounds.Width + Shadow.Width;
+            var height = Bounds.Height + Shadow.Height;
+
+            RenderSurface.Resize(width, height, true);
+            IsArrangeValid = true;
+        }
 
         protected override void PreRender(ICellSurface surface)
         {

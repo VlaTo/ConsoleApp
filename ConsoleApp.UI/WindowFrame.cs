@@ -24,7 +24,7 @@ namespace ConsoleApp.UI
         public Thickness Thickness =>
             WindowFrameType.None == Window.FrameType
                 ? Thickness.Empty
-                : new Thickness(1, 1);
+                : new Thickness(1);
 
         public WindowFrame(Window window)
         {

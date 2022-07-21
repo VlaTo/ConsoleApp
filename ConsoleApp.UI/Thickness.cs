@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 
 namespace ConsoleApp.UI
 {
@@ -31,6 +32,10 @@ namespace ConsoleApp.UI
         public int HorizontalThickness => Left + Right;
 
         public int VerticalThickness => Top + Bottom;
+
+        public Point Origin => new Point(Left, Top);
+
+        public Size Size => new Size(Right, Bottom);
 
         public Thickness(int all)
             : this(all, all, all, all)
