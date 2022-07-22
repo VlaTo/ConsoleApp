@@ -1,4 +1,5 @@
-﻿using SadConsole;
+﻿using ConsoleApp.Bindings;
+using SadConsole;
 using SadConsole.Components;
 using SadConsole.Input;
 using System;
@@ -29,12 +30,8 @@ namespace ConsoleApp.UI.Controls
         {
             Left = 0;
             Top = 0;
-            IsRunning = false;
-            //LayoutManager = new StackLayoutManager
-            //{
-            //    Orientation = StackOrientation.Vertical
-            //};
             LayoutManager = new AbsoluteLayoutManager();
+            IsRunning = false;
         }
 
         static Screen()

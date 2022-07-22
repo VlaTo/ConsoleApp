@@ -1,7 +1,7 @@
-﻿using SadConsole;
-using SadRogue.Primitives;
-using System;
+﻿using ConsoleApp.Bindings;
 using ConsoleApp.UI.Extensions;
+using SadConsole;
+using System;
 
 namespace ConsoleApp.UI.Controls
 {
@@ -54,6 +54,11 @@ namespace ConsoleApp.UI.Controls
         protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
         {
             //surface.Fill(new Rectangle(0, 0, Width, Height), Foreground, Background, '\x20');
+            if (String.IsNullOrEmpty(Text))
+            {
+                return;
+            }
+
             var rectangle = Bounds.ToRectangle();
             surface.Fill(rectangle, Foreground, Background, Glyphs.Whitespace);
 

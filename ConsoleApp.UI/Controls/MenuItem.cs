@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ConsoleApp.Bindings;
 using SadConsole;
 using SadRogue.Primitives;
+using System;
+using System.Collections.Generic;
 
 namespace ConsoleApp.UI.Controls
 {
@@ -152,7 +153,8 @@ namespace ConsoleApp.UI.Controls
 
             if (hasHint)
             {
-                surface[left + hintIndex, rectangle.Y].Foreground = Menu.HintColor;
+                surface.SetForeground(left + hintIndex, rectangle.Y, Menu.HintColor);
+                //[left + hintIndex, rectangle.Y].Foreground = Menu.HintColor;
             }
         }
 

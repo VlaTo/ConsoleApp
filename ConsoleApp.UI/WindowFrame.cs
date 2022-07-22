@@ -1,5 +1,6 @@
 ﻿using System;
 using ConsoleApp.UI.Controls;
+using ConsoleApp.UI.Extensions;
 using SadConsole;
 using SadRogue.Primitives;
 
@@ -26,33 +27,45 @@ namespace ConsoleApp.UI
                 ? Thickness.Empty
                 : new Thickness(1);
 
+        public System.Drawing.Rectangle Bounds
+        {
+            get
+            {
+                if (WindowFrameType.None == Window.FrameType)
+                {
+                    return System.Drawing.Rectangle.Empty;
+                }
+
+                return new System.Drawing.Rectangle(
+                    System.Drawing.Point.Empty,
+                    Window.Bounds.Size - Window.Shadow
+                );
+            }
+        }
+
         public WindowFrame(Window window)
         {
             Window = window;
         }
 
-        public void Render(ICellSurface surface)
+        public virtual void Render(ICellSurface surface)
         {
-            //SadConsole.Shapes.Box box = SadConsole.Shapes.Box.GetDefaultBox();
-            //var rect = new Rectangle(0, 0, window.Width, window.Height);
-            //var rect = new Rectangle(0, 0, Window.Bounds.Width, Window.Bounds.Height);
-            var rectangle = new Rectangle(
-                0,
-                0,
-                Window.Bounds.Width - Window.Shadow.Width,
-                Window.Bounds.Height - Window.Shadow.Height
-            );
+            var shadow = Window.Shadow;
 
-            var foreground = Window.IsFocused ? Color.White : Color.DarkGray;
-            var border = new ColoredGlyph(foreground, Window.Background);
-            var background = new ColoredGlyph(Color.Transparent, Window.Background);
-
-            if (WindowFrameType.None == Window.FrameType)
+            if (shadow.IsEmpty)
             {
-                surface.Fill(rectangle, Color.Transparent, Window.Background, Glyphs.Whitespace);
                 return;
             }
 
+            if (WindowFrameType.None == Window.FrameType)
+            {
+                return;
+            }
+
+            var rectangle = Bounds.ToRectangle();
+            var foreground = Window.IsFocused ? Color.White : Color.DarkGray;
+            var border = new ColoredGlyph(foreground, Window.Background);
+            var background = new ColoredGlyph(Color.Transparent, Window.Background);
             var connectedLineStyle = GetConnectedLineStyle(Window.FrameType);
 
             var options = new ShapeParameters(
@@ -62,17 +75,19 @@ namespace ConsoleApp.UI
                 false,
                 false,
                 true,
-                false,
+                Window.IsOpaque,
                 background,
                 false,
                 false,
                 false,
                 true,
                 connectedLineStyle,
-                ColoredGlyph.CreateArray(8)
+                null
             );
 
             surface.DrawBox(rectangle, options);
+
+            //surface.ConnectLines(connectedLineStyle, rectangle);
 
             if (String.IsNullOrEmpty(Window.Title))
             {
@@ -89,7 +104,7 @@ namespace ConsoleApp.UI
             surface.Print(offset + 1, 0, Window.Title, foreground);
         }
 
-        private static int[] GetConnectedLineStyle(WindowFrameType frameType)
+        protected static int[] GetConnectedLineStyle(WindowFrameType frameType)
         {
             switch (frameType)
             {

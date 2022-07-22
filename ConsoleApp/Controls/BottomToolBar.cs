@@ -1,10 +1,7 @@
-﻿using System;
-using System.Drawing;
+﻿using ConsoleApp.Bindings;
 using ConsoleApp.UI;
 using ConsoleApp.UI.Controls;
-using ConsoleApp.UI.Extensions;
-using SadConsole;
-//using SadRogue.Primitives;
+using System.Drawing;
 using Color = SadRogue.Primitives.Color;
 using HorizontalAlignment = ConsoleApp.UI.HorizontalAlignment;
 using VerticalAlignment = ConsoleApp.UI.VerticalAlignment;
@@ -33,6 +30,7 @@ namespace ConsoleApp.Controls
             textBox = new TextBox
             {
                 Background = Color.Transparent,
+                Foreground = Foreground,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 Padding = new Thickness(1, 0),
                 Height = 1,
@@ -49,6 +47,12 @@ namespace ConsoleApp.Controls
 
             Children.Add(textBox);
             //Children.Add(loadingIndicator);
+
+            textBox.SetBinding(TextBox.TextProperty, new Binding
+            {
+                Source = this,
+                PropertyPath = new PropertyPath(nameof(Hint))
+            });
         }
 
         static BottomToolBar()
@@ -61,7 +65,7 @@ namespace ConsoleApp.Controls
             );
         }
 
-        public override void Render(ICellSurface surface, TimeSpan elapsed)
+        /*public override void Render(ICellSurface surface, TimeSpan elapsed)
         {
             //var rectangle = new Rectangle(new Point(), Bounds.Size);
             var rectangle = Bounds.ToRectangle();
@@ -69,7 +73,7 @@ namespace ConsoleApp.Controls
             RenderSurface.Fill(rectangle, Foreground, Background, '\x20');
 
             base.Render(surface, elapsed);
-        }
+        }*/
 
         public override void Arrange(Rectangle bounds)
         {
@@ -94,7 +98,7 @@ namespace ConsoleApp.Controls
 
         private void OnHintChanged()
         {
-            textBox.Text = Hint;
+            //textBox.Text = Hint;
         }
 
         private static void OnHintPropertyChanged(BindableObject sender, object newvalue, object oldvalue)

@@ -1,4 +1,5 @@
-﻿using ConsoleApp.UI.Extensions;
+﻿using ConsoleApp.Bindings;
+using ConsoleApp.UI.Extensions;
 using SadConsole;
 using System;
 using System.Drawing;
@@ -36,6 +37,7 @@ namespace ConsoleApp.UI.Controls
         protected WindowFrame Frame
         {
             get;
+            set;
         }
 
         internal Size Shadow
@@ -159,10 +161,12 @@ namespace ConsoleApp.UI.Controls
                 Bounds.Height - frameThickness.VerticalThickness - Shadow.Height
             );
 
-            Frame.Render(RenderSurface);
+            //Frame.Render(RenderSurface);
             RenderSurface.Fill(rectangle, Foreground, Background, Glyphs.Whitespace);
 
             RenderChildren(elapsed);
+            
+            Frame.Render(RenderSurface);
 
             IsDirty = false;
         }

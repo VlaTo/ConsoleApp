@@ -1,4 +1,5 @@
-﻿using SadConsole;
+﻿using ConsoleApp.Bindings;
+using SadConsole;
 using SadRogue.Primitives;
 
 namespace ConsoleApp.UI.Controls

@@ -1,7 +1,7 @@
-﻿using SadConsole;
-using SadRogue.Primitives;
-using System;
+﻿using ConsoleApp.Bindings;
 using ConsoleApp.UI.Extensions;
+using SadConsole;
+using System;
 
 namespace ConsoleApp.UI
 {
@@ -32,19 +32,6 @@ namespace ConsoleApp.UI
             );
         }
 
-        /*public override void Render(ICellSurface surface, TimeSpan elapsed)
-        {
-            surface.Copy(RenderSurface);
-
-
-            if (0 < Children.Count)
-            {
-                RenderChildren(elapsed);
-            }
-
-            RenderSurface.Copy(surface);
-        }*/
-
         protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
         {
             if (IsDirty || false == IsOpaque)
@@ -63,15 +50,6 @@ namespace ConsoleApp.UI
         protected virtual void OnBackgroundShadeFactorChanged()
         {
             Invalidate();
-        }
-
-        private static Color Shade(Color color, float factor)
-        {
-            var r = (byte)(color.R * (1 - factor));
-            var g = (byte)(color.G * (1 - factor));
-            var b = (byte)(color.B * (1 - factor));
-
-            return new Color(r, g, b, color.A);
         }
 
         private static void OnBackgroundShadeFactorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)

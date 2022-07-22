@@ -1,6 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ConsoleApp.Bindings;
 using ConsoleApp.UI.Controls;
+using System;
+using System.Collections.Generic;
 
 namespace ConsoleApp.UI
 {

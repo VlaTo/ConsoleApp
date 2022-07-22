@@ -1,19 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using ConsoleApp.Bindings;
 using Color = SadRogue.Primitives.Color;
 
 namespace ConsoleApp.UI.Controls
 {
     public sealed class MenuDropDown : Window
     {
+        public MenuList MenuList
+        {
+            get;
+            private set;
+        }
+
+        public MenuDropDown()
+        {
+            Frame = new MenuDropDownFrame(this);
+        }
+
         public static void Show(Rectangle anchor, IList<MenuElement> menuElements)
         {
             var application = ConsoleApplication.Instance;
             var dialogManager = application.DialogManager;
             var dropDown = new MenuDropDown
             {
-                Background = Color.DarkCyan,
-                Foreground = Color.White,
+                FrameType = WindowFrameType.Thick,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
                 Left = anchor.Left,
@@ -22,21 +33,30 @@ namespace ConsoleApp.UI.Controls
 
             var menuList = new MenuList
             {
-                Background = Color.DarkCyan,
-                Foreground = Color.White,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                Width = 24,
-                Height = 10
+                VerticalAlignment = VerticalAlignment.Stretch
             };
 
-            // NOTE: use Binding here
+            menuList.SetBinding(BackgroundProperty, new Binding
+            {
+                Source = dropDown,
+                PropertyPath = new PropertyPath(nameof(Background))
+            });
+            menuList.SetBinding(ForegroundProperty, new Binding
+            {
+                Source = dropDown,
+                PropertyPath = new PropertyPath(nameof(Foreground))
+            });
+
             for (var index = 0; index < menuElements.Count; index++)
             {
                 menuList.Items.Add(menuElements[index]);
             }
 
             dropDown.Children.Add(menuList);
+            dropDown.MenuList = menuList;
+            dropDown.Background = Color.DarkCyan;
+            dropDown.Foreground = Color.White;
 
             dialogManager.ShowModal(dropDown);
         }

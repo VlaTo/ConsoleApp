@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ConsoleApp.Bindings;
 using SadConsole;
 using SadConsole.Input;
 using SadRogue.Primitives;
+using System;
+using System.Collections.Generic;
 
 namespace ConsoleApp.UI.Controls
 {
@@ -237,8 +238,6 @@ namespace ConsoleApp.UI.Controls
                 );
                 RenderMenuItems(surface, bounds, elapsed);
             }
-
-            //base.Render(surface, elapsed);
         }
 
         protected abstract void RenderMenuItems(ICellSurface surface, System.Drawing.Rectangle bounds, TimeSpan elapsed);

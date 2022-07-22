@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using ConsoleApp.Bindings;
 using SadConsole;
 using SadConsole.Input;
 using Color = SadRogue.Primitives.Color;

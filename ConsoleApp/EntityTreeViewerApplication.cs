@@ -75,8 +75,7 @@ namespace ConsoleApp
             toolBar = new BottomToolBar
             {
                 Foreground = Color.Black,
-                Background = Color.DarkCyan,
-                Hint = "EntityTreeViewer, version: 0.1"
+                Background = Color.DarkCyan
             };
 
             Container.Children.Add(toolBar);
@@ -112,7 +111,7 @@ namespace ConsoleApp
 
         private void DoConnect(object sender, EventArgs e)
         {
-            ;
+            toolBar.Hint = "EntityTreeViewer, version: 0.1";
         }
 
         private void DoExit(object sender, EventArgs e)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using ConsoleApp.Bindings;
 using ConsoleApp.UI;
 using SadConsole;
 using SadRogue.Primitives;
