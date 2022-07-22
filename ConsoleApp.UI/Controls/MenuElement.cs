@@ -9,11 +9,18 @@ namespace ConsoleApp.UI.Controls
         public static readonly BindableProperty IsEnabledProperty;
         public static readonly BindableProperty MenuProperty;
         public static readonly BindableProperty ParentProperty;
-        
+        public static readonly BindableProperty IsVisibleProperty;
+
         public bool IsEnabled
         {
             get => (bool)GetValue(IsEnabledProperty);
             set => SetValue(IsEnabledProperty, value);
+        }
+
+        public bool IsVisible
+        {
+            get => (bool)GetValue(IsVisibleProperty);
+            set => SetValue(IsVisibleProperty, value);
         }
 
         public MenuBar Menu
@@ -56,11 +63,16 @@ namespace ConsoleApp.UI.Controls
                 defaultValue: null,
                 propertyChanged: OnParentPropertyChanged
             );
+            IsVisibleProperty = BindableProperty.Create(
+                nameof(IsVisible),
+                typeof(bool),
+                typeof(MenuElement),
+                defaultValue: true,
+                propertyChanged: OnIsVisiblePropertyChanged
+            );
         }
 
-        //public abstract System.Drawing.Rectangle GetBounds();
-
-        public abstract void Render(ICellSurface surface, Rectangle rectangle, bool isSelected /*, Color background, Color foreground, Color hint*/);
+        public abstract void Render(ICellSurface surface, Rectangle rectangle, bool isSelected);
 
         protected Color GetForegroundColor(bool isSelected)
         {
@@ -86,10 +98,20 @@ namespace ConsoleApp.UI.Controls
         {
             ;
         }
-        
+
+        protected virtual void OnIsVisibleChanged()
+        {
+            ;
+        }
+
         private static void OnIsEnabledPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
         {
             ((MenuElement)sender).OnIsEnabledChanged();
+        }
+
+        private static void OnIsVisiblePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((MenuElement)sender).OnIsVisibleChanged();
         }
 
         private static void OnMenuPropertyChanged(BindableObject sender, object newvalue, object oldvalue)

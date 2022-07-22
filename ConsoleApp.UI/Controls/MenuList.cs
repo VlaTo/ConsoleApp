@@ -17,15 +17,24 @@ namespace ConsoleApp.UI.Controls
             if (false == IsMeasureValid)
             {
                 var width = 0;
-                var count = null == Items ? 0 : Items.Count;
+                var count = 0;
 
-                for (var index = 0; index < count; index++)
+                for (var index = 0; index < Items.Count; index++)
                 {
-                    if (Items[index] is MenuItem menuItem)
+                    var item = Items[index];
+
+                    if (false == item.IsVisible)
+                    {
+                        continue;
+                    }
+
+                    if (item is MenuItem menuItem)
                     {
                         var length = menuItem.TitleLength;
                         width = Math.Max(width, length + 6);
                     }
+
+                    count++;
                 }
 
                 var height = Math.Min(count, heightConstraint);
@@ -35,8 +44,6 @@ namespace ConsoleApp.UI.Controls
             }
 
             return DesiredSize;
-
-            //return base.Measure(widthConstraint, heightConstraint);
         }
 
         protected override void RenderMenuItems(ICellSurface surface, Rectangle bounds, TimeSpan elapsed)
@@ -48,7 +55,7 @@ namespace ConsoleApp.UI.Controls
             {
                 if (Items[index] is MenuItem menuItem)
                 {
-                    var isSelected = (IsFocused || IsPopupOpened) && ReferenceEquals(SelectedItem, menuItem);
+                    var isSelected = (IsFocused || IsDropDownOpened) && ReferenceEquals(SelectedItem, menuItem);
                     var rect = new SadRogue.Primitives.Rectangle(rectangle.X, y, rectangle.Width, 1);
 
                     Items[index].Render(surface, rect, isSelected);

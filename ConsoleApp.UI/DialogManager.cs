@@ -62,6 +62,20 @@ namespace ConsoleApp.UI
             overlay.Children.Add(window);
         }
 
+        public void Dismiss(Window window)
+        {
+            if (Windows.Remove(window))
+            {
+                overlay.Children.Remove(window);
+
+                if (0 == Windows.Count)
+                {
+                    Screen.Children.Remove(overlay);
+                    overlay = null;
+                }
+            }
+        }
+
         protected virtual void OnBackgroundShadeFactorChanged()
         {
             ;

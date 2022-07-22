@@ -8,6 +8,8 @@ namespace ConsoleApp.UI
     {
         public static ConsoleApplication Instance;
 
+        private readonly Background background;
+
         public Screen Screen
         {
             get;
@@ -18,17 +20,17 @@ namespace ConsoleApp.UI
             get;
         }
 
-        public Background Background
-        {
-            get;
-        }
-
         public Layout Container
         {
             get;
         }
 
         public DialogManager DialogManager
+        {
+            get;
+        }
+
+        public WindowManager WindowManager
         {
             get;
         }
@@ -53,7 +55,7 @@ namespace ConsoleApp.UI
                 VerticalAlignment = VerticalAlignment.Stretch
             };
 
-            Background = new Background
+            background = new Background
             {
                 Background = Color.DarkBlue,
                 Foreground = Color.DarkGray,
@@ -83,25 +85,32 @@ namespace ConsoleApp.UI
             topBar.Children.Add(time);
             
             Container.Children.Add(topBar);
-            Container.Children.Add(Background);
+            Container.Children.Add(background);
 
             Screen.Children.Add(Container);
 
             MenuBar.OnMenuCancel += DoMenuCancel;
             
             DialogManager = new DialogManager(screen);
+            WindowManager = background.WindowManager;
         }
 
         public void Run()
         {
             Screen.Start();
-            Background.Focus();
+            background.Focus();
             SadConsole.Game.Instance.Run();
+        }
+
+        public void Exit()
+        {
+            var instance = SadConsole.Game.Instance.MonoGameInstance;
+            instance.Exit();
         }
 
         protected virtual void DoMenuCancel(object sender, EventArgs e)
         {
-            Background.Focus();
+            background.Focus();
         }
     }
 }

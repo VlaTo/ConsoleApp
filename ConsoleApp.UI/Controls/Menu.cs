@@ -34,6 +34,7 @@ namespace ConsoleApp.UI.Controls
         public static readonly BindableProperty DisabledColorProperty;
         
         private int selectedIndex;
+        private MenuDropDown menuDropDown;
 
         public Color SelectionBackground
         {
@@ -90,10 +91,9 @@ namespace ConsoleApp.UI.Controls
             }
         }
         
-        public bool IsPopupOpened
+        public bool IsDropDownOpened
         {
-            get;
-            protected set;
+            get => null != menuDropDown;
         }
 
         protected MenuOrientation Orientation
@@ -170,9 +170,9 @@ namespace ConsoleApp.UI.Controls
                 SelectedIndex = index;
                 Invalidate();
 
-                if (IsPopupOpened && SelectedItem is MenuItem menuItem)
+                if (IsDropDownOpened && SelectedItem is MenuItem menuItem)
                 {
-                    menuItem.ShowItems();
+                    ShowMenuDropDown(menuItem);
                 }
 
                 return true;
@@ -180,11 +180,9 @@ namespace ConsoleApp.UI.Controls
 
             if (IsDropDownKey(key))
             {
-                if (SelectedItem is MenuItem menuItem && 0 < menuItem.Items.Count && false == IsPopupOpened)
+                if (SelectedItem is MenuItem menuItem && 0 < menuItem.Items.Count && false == IsDropDownOpened)
                 {
-                    IsPopupOpened = true;
-
-                    menuItem.ShowItems();
+                    ShowMenuDropDown(menuItem);
 
                     return true;
                 }
@@ -196,11 +194,9 @@ namespace ConsoleApp.UI.Controls
             {
                 if (SelectedItem is MenuItem menuItem)
                 {
-                    if (0 < menuItem.Items.Count && false == IsPopupOpened)
+                    if (0 < menuItem.Items.Count && false == IsDropDownOpened)
                     {
-                        IsPopupOpened = true;
-                        
-                        menuItem.ShowItems();
+                        ShowMenuDropDown(menuItem);
 
                         return true;
                     }
@@ -216,10 +212,18 @@ namespace ConsoleApp.UI.Controls
 
         internal void NotifyOnClick(MenuItem menuItem)
         {
-            if (null != menuItem && ReferenceEquals(menuItem.Menu, this))
+            if (null == menuItem || false == ReferenceEquals(menuItem.Menu, this))
             {
-                RaiseOnMenuItemClick(new MenuItemClickEventArgs(menuItem));
+                return;
             }
+
+            if (IsDropDownOpened)
+            {
+                DismissMenuDropDown();
+            }
+            
+            RaiseMenuCancel(EventArgs.Empty);
+            RaiseOnMenuItemClick(new MenuItemClickEventArgs(menuItem));
         }
 
         protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
@@ -369,6 +373,33 @@ namespace ConsoleApp.UI.Controls
             }
         }
 
+        protected void DismissMenuDropDown()
+        {
+            var application = ConsoleApplication.Instance;
+            var dialogManager = application.DialogManager;
+
+            menuDropDown.MenuList.OnMenuCancel -= OnMenuDismiss;
+
+            dialogManager.Dismiss(menuDropDown);
+
+            menuDropDown = null;
+
+            Focus();
+        }
+
+        protected void ShowMenuDropDown(MenuItem menuItem)
+        {
+            var application = ConsoleApplication.Instance;
+            var dialogManager = application.DialogManager;
+
+            var anchor = new System.Drawing.Rectangle(2, 0, menuItem.TitleLength, 1);
+
+            menuDropDown = MenuDropDown.Create(anchor, menuItem.Items);
+            menuDropDown.MenuList.OnMenuCancel += OnMenuDismiss;
+
+            dialogManager.ShowModal(menuDropDown);
+        }
+
         protected virtual void OnDisabledColorChanged()
         {
             ;
@@ -428,6 +459,11 @@ namespace ConsoleApp.UI.Controls
         private bool IsDropDownKey(AsciiKey key)
         {
             return MenuOrientation.Horizontal == Orientation && Keys.Down == key;
+        }
+
+        private void OnMenuDismiss(object sender, EventArgs e)
+        {
+            DismissMenuDropDown();
         }
 
         private static void OnHintColorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)

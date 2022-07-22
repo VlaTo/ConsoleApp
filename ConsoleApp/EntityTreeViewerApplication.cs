@@ -6,12 +6,13 @@ using SadRogue.Primitives;
 
 namespace ConsoleApp
 {
-    internal sealed class EntityTreeViewerApplication:ConsoleApplication
+    internal sealed class EntityTreeViewerApplication : ConsoleApplication
     {
         private readonly EntityTreeViewWindow window;
         private readonly MenuItem connectMenuItem;
         private readonly MenuItem exitMenuItem;
         private readonly BottomToolBar toolBar;
+        private MenuItem windowsMenuItem;
 
         public EntityTreeViewerApplication(Screen screen)
             : base(screen)
@@ -25,6 +26,10 @@ namespace ConsoleApp
             exitMenuItem = new MenuItem
             {
                 Title = "E~xit",
+            };
+            windowsMenuItem = new MenuItem
+            {
+                Title = "~Windows",
             };
 
             connectMenuItem.OnClick += DoConnect;
@@ -67,6 +72,7 @@ namespace ConsoleApp
                 Title = "~Macro",
                 IsEnabled = false
             });
+            MenuBar.Items.Add(windowsMenuItem);
             MenuBar.Items.Add(new MenuItem
             {
                 Title = "T~ests"
@@ -79,7 +85,7 @@ namespace ConsoleApp
             };
 
             Container.Children.Add(toolBar);
-            
+
             var temp = new Window
             {
                 Title = "Window #1",
@@ -105,8 +111,8 @@ namespace ConsoleApp
                 Height = 40
             };
 
-            Background.Children.Add(window);
-            Background.Children.Add(temp);
+            WindowManager.AddWindow(window);
+            WindowManager.AddWindow(temp);
         }
 
         private void DoConnect(object sender, EventArgs e)
@@ -116,7 +122,7 @@ namespace ConsoleApp
 
         private void DoExit(object sender, EventArgs e)
         {
-            ;
+            Exit();
         }
     }
 }

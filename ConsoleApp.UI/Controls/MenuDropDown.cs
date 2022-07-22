@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using ConsoleApp.Bindings;
 using Color = SadRogue.Primitives.Color;
@@ -18,10 +19,8 @@ namespace ConsoleApp.UI.Controls
             Frame = new MenuDropDownFrame(this);
         }
 
-        public static void Show(Rectangle anchor, IList<MenuElement> menuElements)
+        public static MenuDropDown Create(Rectangle anchor, IList<MenuElement> menuElements)
         {
-            var application = ConsoleApplication.Instance;
-            var dialogManager = application.DialogManager;
             var dropDown = new MenuDropDown
             {
                 FrameType = WindowFrameType.Thick,
@@ -58,7 +57,7 @@ namespace ConsoleApp.UI.Controls
             dropDown.Background = Color.DarkCyan;
             dropDown.Foreground = Color.White;
 
-            dialogManager.ShowModal(dropDown);
+            return dropDown;
         }
 
         public override Size Measure(int widthConstraint, int heightConstraint)

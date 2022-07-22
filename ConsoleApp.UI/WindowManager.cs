@@ -8,13 +8,18 @@ namespace ConsoleApp.UI
         Next
     }
 
-    public class WindowsManager
+    public class WindowManager
     {
         private readonly VisualGroup owner;
 
-        public WindowsManager(VisualGroup owner)
+        public WindowManager(VisualGroup owner)
         {
             this.owner = owner;
+        }
+
+        public void AddWindow(Window window)
+        {
+            owner.Children.Add(window);
         }
 
         public bool FocusWindow(MoveDirection direction)

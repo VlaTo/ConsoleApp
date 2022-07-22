@@ -16,14 +16,14 @@ namespace ConsoleApp.UI.Controls
             set => SetValue(GlyphProperty, value);
         }
 
-        internal WindowsManager WindowsManager
+        internal WindowManager WindowManager
         {
             get;
         }
 
         public Background()
         {
-            WindowsManager = new WindowsManager(this);
+            WindowManager = new WindowManager(this);
             LayoutManager = new AbsoluteLayoutManager();
         }
 
@@ -42,7 +42,7 @@ namespace ConsoleApp.UI.Controls
         {
             if (Keys.F6 == key)
             {
-                return WindowsManager.FocusWindow(modificators.IsShiftPressed ? MoveDirection.Previous : MoveDirection.Next);
+                return WindowManager.FocusWindow(modificators.IsShiftPressed ? MoveDirection.Previous : MoveDirection.Next);
             }
 
             return base.HandleKeyPressed(key, modificators);
