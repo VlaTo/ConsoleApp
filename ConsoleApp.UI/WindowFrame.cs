@@ -15,6 +15,12 @@ namespace ConsoleApp.UI
         public const char Filler0 = '\xB1';
 
         public const char DirectionRight = '\x10';
+
+        public const char Point0 = '*';
+
+        public const char SquareBracketLeft = '[';
+        
+        public const char SquareBracketRight = ']';
     }
 
     public class WindowFrame
@@ -96,14 +102,26 @@ namespace ConsoleApp.UI
                 return;
             }
 
-            var length = Window.Title.Length;
-            var space = Window.Bounds.Width - 4;
-            var width = Math.Min(length, space);
-            var offset = (space - width) >> 1;
+            var length = Window.Title.Length - 4;
+            //var space = GetAvailableWidth();
+            var left = 2;
+            // var width = Math.Min(length, space);
 
-            surface[offset, 0].Glyph = Glyphs.Whitespace;
-            surface[offset + width + 1, 0].Glyph = Glyphs.Whitespace;
-            surface.Print(offset + 1, 0, Window.Title, foreground);
+            if (Window.CanMove)
+            {
+                surface.SetGlyph(left, 0, Glyphs.SquareBracketLeft);
+                surface.SetGlyph(left + 1, 0, Glyphs.Point0, Color.AnsiGreen);
+                surface.SetGlyph(left + 2, 0, Glyphs.SquareBracketRight);
+
+                left += 3;
+                length -= 5;
+            }
+
+            var offset = length >> 1;
+
+            surface.SetGlyph(left + offset, 0, Glyphs.Whitespace);
+            //surface.SetGlyph(offset + width + 1, 0, Glyphs.Whitespace);
+            surface.Print(left + offset + 1, 0, Window.Title, foreground);
         }
 
         protected static int[] GetConnectedLineStyle(WindowFrameType frameType)
@@ -125,6 +143,18 @@ namespace ConsoleApp.UI
                     return ICellSurface.ConnectedLineEmpty;
                 }
             }
+        }
+
+        private int GetAvailableWidth()
+        {
+            var width = Window.Bounds.Width;
+
+            if (Window.CanMove)
+            {
+                width -= 3;
+            }
+
+            return width - 4;
         }
     }
 }

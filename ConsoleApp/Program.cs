@@ -95,7 +95,7 @@ namespace ConsoleApp
                 Text = "OK",
                 TextAlignment = SadConsole.HorizontalAlignment.Center
             };
-            var textBox = new SadConsole.Controls.TextBox(10)
+            var textBox = new SadConsole.Controls.Label(10)
             {
                 Text = "Sample",
                 Position = new Point(4, 6),

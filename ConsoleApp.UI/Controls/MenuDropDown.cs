@@ -6,7 +6,7 @@ using Color = SadRogue.Primitives.Color;
 
 namespace ConsoleApp.UI.Controls
 {
-    public sealed class MenuDropDown : Window
+    public sealed class MenuDropDown : Popup
     {
         public MenuList MenuList
         {

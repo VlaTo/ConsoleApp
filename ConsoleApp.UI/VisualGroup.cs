@@ -132,26 +132,6 @@ namespace ConsoleApp.UI
             return DesiredSize;
         }
 
-        /*public override void Render(ICellSurface surface, TimeSpan elapsed)
-        {
-            var transparent = false == IsOpaque;
-
-            if (transparent)
-            {
-                surface.Copy(RenderSurface);
-            }
-
-            if (IsDirty || transparent)
-            {
-                DoRender();
-                RenderChildren(elapsed);
-
-                IsDirty = false;
-            }
-
-            RenderSurface.Copy(surface);
-        }*/
-
         public override void Invalidate()
         {
             for (var index = 0; index < Children.Count; index++)
@@ -282,6 +262,11 @@ namespace ConsoleApp.UI
         {
             foreach (var child in Children)
             {
+                if (false == child.IsVisible)
+                {
+                    continue;
+                }
+
                 var childBounds = child.Bounds.ToRectangle();
                 var rectangle = SadRogue.Primitives.Rectangle.GetIntersection(RenderSurface.Area, childBounds);
 

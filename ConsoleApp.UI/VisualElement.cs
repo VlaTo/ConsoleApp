@@ -456,10 +456,10 @@ namespace ConsoleApp.UI
         {
             var left = CalculateLeft(bounds.X, bounds.Width);
             var top = CalculateTop(bounds.Top, bounds.Height);
-
-
-            var width = Math.Max(0, bounds.Width - Padding.HorizontalThickness);
-            var height = Math.Max(0, bounds.Height - Padding.VerticalThickness);
+            // var width = Math.Max(0, bounds.Width - Padding.HorizontalThickness);
+            // var height = Math.Max(0, bounds.Height - Padding.VerticalThickness);
+            var width = Math.Max(0, bounds.Width - Margin.HorizontalThickness);
+            var height = Math.Max(0, bounds.Height - Margin.VerticalThickness);
             
             width = Math.Min(DesiredSize.Width, width);
             height = Math.Min(DesiredSize.Height, height);

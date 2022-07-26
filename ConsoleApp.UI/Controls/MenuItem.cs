@@ -120,6 +120,14 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
+        public bool IsHotKey(char character)
+        {
+            var title = Title;
+            var hintIndex = title.IndexOf('~');
+            var hasHint = 0 <= hintIndex;
+            return hasHint && Char.ToLower(title[hintIndex + 1]) == Char.ToLower(character);
+        }
+
         public override void Render(ICellSurface surface, Rectangle rectangle, bool isSelected, bool renderGlyph)
         {
             var left = rectangle.X + 2;

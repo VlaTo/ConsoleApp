@@ -127,7 +127,10 @@ namespace ConsoleApp
             toolBar = new BottomToolBar
             {
                 Foreground = Color.Black,
-                Background = Color.DarkCyan
+                Background = Color.DarkCyan,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Height = 1
             };
 
             Container.Children.Add(toolBar);
@@ -159,11 +162,14 @@ namespace ConsoleApp
 
             WindowManager.AddWindow(window);
             WindowManager.AddWindow(temp);
+
+            toolBar.Hint = "EntityTreeViewer, version: 0.1";
+
         }
 
         private void DoConnect()
         {
-            toolBar.Hint = "EntityTreeViewer, version: 0.1";
+            //toolBar.Hint = "EntityTreeViewer, version: 0.1";
         }
 
         private void DoExit()

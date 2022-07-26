@@ -2,6 +2,7 @@
 using ConsoleApp.UI;
 using ConsoleApp.UI.Controls;
 using System.Drawing;
+using SadConsole;
 using Color = SadRogue.Primitives.Color;
 using HorizontalAlignment = ConsoleApp.UI.HorizontalAlignment;
 using VerticalAlignment = ConsoleApp.UI.VerticalAlignment;
@@ -12,7 +13,7 @@ namespace ConsoleApp.Controls
     {
         public static readonly BindableProperty HintProperty;
 
-        private readonly TextBox textBox;
+        private readonly Label label;
         private readonly LoadingIndicator loadingIndicator;
         
         public string Hint
@@ -23,18 +24,13 @@ namespace ConsoleApp.Controls
 
         public BottomToolBar()
         {
-            Height = 1;
-            VerticalAlignment = VerticalAlignment.Bottom;
-            HorizontalAlignment = HorizontalAlignment.Stretch;
-
-            textBox = new TextBox
+            label = new Label
             {
                 Background = Color.Transparent,
                 Foreground = Foreground,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 Padding = new Thickness(1, 0),
-                Height = 1,
-                //Width = 100
+                Height = 1
             };
 
             loadingIndicator = new LoadingIndicator
@@ -45,10 +41,10 @@ namespace ConsoleApp.Controls
                 Width = 24
             };
 
-            Children.Add(textBox);
+            Children.Add(label);
             //Children.Add(loadingIndicator);
 
-            textBox.SetBinding(TextBox.TextProperty, new Binding
+            label.SetBinding(Label.TextProperty, new Binding
             {
                 Source = this,
                 PropertyPath = new PropertyPath(nameof(Hint))
@@ -80,9 +76,17 @@ namespace ConsoleApp.Controls
             base.Arrange(bounds);
         }
 
+        protected override void PreRender(ICellSurface surface)
+        {
+            base.PreRender(surface);
+
+            // var rectangle=
+            // RenderSurface.Fill()
+        }
+
         protected override void OnBackgroundColorChanged()
         {
-            textBox.Background = Background;
+            label.Background = Background;
             loadingIndicator.Background = Background;
 
             base.OnBackgroundColorChanged();
@@ -90,7 +94,7 @@ namespace ConsoleApp.Controls
 
         protected override void OnForegroundColorChanged()
         {
-            textBox.Foreground = Foreground;
+            label.Foreground = Foreground;
             //loadingIndicator.Background = Background;
 
             base.OnForegroundColorChanged();
@@ -98,7 +102,7 @@ namespace ConsoleApp.Controls
 
         private void OnHintChanged()
         {
-            //textBox.Text = Hint;
+            //label.Text = Hint;
         }
 
         private static void OnHintPropertyChanged(BindableObject sender, object newvalue, object oldvalue)

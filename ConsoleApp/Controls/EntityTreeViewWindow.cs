@@ -6,12 +6,12 @@ namespace ConsoleApp.Controls
 {
     public class EntityTreeViewWindow : Window
     {
-        //private readonly UI.TextBox textBox;
+        //private readonly UI.Label textBox;
         private readonly LoadingIndicator indicator;
 
         public EntityTreeViewWindow()
         {
-            /*textBox = new UI.TextBox
+            /*textBox = new UI.Label
             {
                 Foreground = Color.White,
                 Background = Color.Brown,

@@ -5,7 +5,7 @@ using System;
 
 namespace ConsoleApp.UI.Controls
 {
-    internal class Button : VisualElement
+    internal class Button : Control
     {
         public static readonly BindableProperty TextProperty;
 
@@ -23,11 +23,6 @@ namespace ConsoleApp.UI.Controls
                 typeof(Button),
                 propertyChanged: OnTextPropertyChanged
             );
-        }
-
-        public override void Invalidate()
-        {
-            ;
         }
 
         protected override void PreRender(ICellSurface surface)

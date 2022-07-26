@@ -20,12 +20,19 @@ namespace ConsoleApp.UI.Controls
         public const float ShadowForegroundShadeFactor = 0.15f;
 
         public static readonly BindableProperty FrameTypeProperty;
+        public static readonly BindableProperty CanMoveProperty;
         public static readonly BindableProperty TitleProperty;
 
         public WindowFrameType FrameType
         {
             get => (WindowFrameType)GetValue(FrameTypeProperty);
             set => SetValue(FrameTypeProperty, value);
+        }
+
+        public bool CanMove
+        {
+            get => (bool)GetValue(CanMoveProperty);
+            set => SetValue(CanMoveProperty, value);
         }
 
         public string Title
@@ -61,6 +68,13 @@ namespace ConsoleApp.UI.Controls
                 defaultValue: WindowFrameType.Thick,
                 propertyChanged: OnFrameTypePropertyChanged
             );
+            CanMoveProperty = BindableProperty.Create(
+                nameof(CanMove),
+                typeof(bool),
+                ownerType: typeof(Window),
+                defaultValue: true,
+                propertyChanged: OnCanMovePropertyChanged
+            );
             TitleProperty = BindableProperty.Create(
                 nameof(Title),
                 propertyType: typeof(string),
@@ -68,6 +82,7 @@ namespace ConsoleApp.UI.Controls
                 propertyChanged: OnTitlePropertyChanged
             );
         }
+
         public override Size Measure(int widthConstraint, int heightConstraint)
         {
             if (false == IsMeasureValid)
@@ -180,6 +195,11 @@ namespace ConsoleApp.UI.Controls
             ;
         }
 
+        protected virtual void OnCanMoveChanged()
+        {
+            ;
+        }
+
         protected virtual void OnTitleChanged()
         {
             ;
@@ -188,6 +208,11 @@ namespace ConsoleApp.UI.Controls
         private static void OnFrameTypePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
         {
             ((Window)sender).OnFrameTypeChanged();
+        }
+
+        private static void OnCanMovePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((Window)sender).OnCanMoveChanged();
         }
 
         private static void OnTitlePropertyChanged(object sender, object newValue, object oldValue)

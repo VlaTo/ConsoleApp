@@ -25,6 +25,11 @@ namespace ConsoleApp.UI
             get;
         }
 
+        public PopupManager PopupManager
+        {
+            get;
+        }
+
         public DialogManager DialogManager
         {
             get;
@@ -89,8 +94,7 @@ namespace ConsoleApp.UI
 
             Screen.Children.Add(Container);
 
-            // MenuBar.OnMenuCancel += DoMenuCancel;
-            
+            PopupManager = new PopupManager(screen);
             DialogManager = new DialogManager(screen);
             WindowManager = background.WindowManager;
         }

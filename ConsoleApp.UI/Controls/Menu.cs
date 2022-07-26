@@ -229,7 +229,7 @@ namespace ConsoleApp.UI.Controls
 
             if (Char.IsLetterOrDigit(key.Character) && modificators.IsEmpty)
             {
-                for (int index = 0; index < Items.Count; index++)
+                for (var index = 0; index < Items.Count; index++)
                 {
                     var menuElement = Items[index];
 
@@ -238,11 +238,16 @@ namespace ConsoleApp.UI.Controls
                         continue;
                     }
 
-                    if (menuElement is MenuItem menuItem)
+                    if (menuElement is MenuItem menuItem && menuItem.IsHotKey(key.Character))
                     {
+                        SelectedIndex = index;
+                        Invalidate();
 
+                        break;
                     }
                 }
+
+                return true;
             }
 
             return false;
@@ -432,11 +437,7 @@ namespace ConsoleApp.UI.Controls
         {
             if (IsDropDownOpened)
             {
-                var application = ConsoleApplication.Instance;
-                var dialogManager = application.DialogManager;
-
-                dialogManager.Dismiss(menuDropDown);
-                
+                menuDropDown.Dismiss();
                 menuDropDown = null;
             }
 
@@ -491,9 +492,6 @@ namespace ConsoleApp.UI.Controls
 
         protected void ShowMenuDropDown(MenuItem menuItem)
         {
-            var application = ConsoleApplication.Instance;
-            var dialogManager = application.DialogManager;
-
             var anchor = MakeAbsolute(GetMenuItemBounds(menuItem));
 
             anchor.Offset(MenuDropDownOffset);
@@ -505,7 +503,7 @@ namespace ConsoleApp.UI.Controls
                 menuDropDown.MenuList.Items.Add(menuItem.Items[index]);
             }
 
-            dialogManager.ShowModal(menuDropDown);
+            menuDropDown.Show();
         }
 
         protected abstract System.Drawing.Rectangle GetMenuItemBounds(MenuItem menuItem);
