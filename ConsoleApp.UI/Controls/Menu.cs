@@ -4,6 +4,7 @@ using SadConsole.Input;
 using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
+using Point = System.Drawing.Point;
 
 namespace ConsoleApp.UI.Controls
 {
@@ -24,6 +25,14 @@ namespace ConsoleApp.UI.Controls
         {
             MenuItem = menuItem;
         }
+    }
+
+    internal enum DismissReason
+    {
+        ItemClick,
+        UserCancel,
+        MoveNext,
+        MovePrevious
     }
     
     public abstract class Menu : VisualElement
@@ -91,24 +100,35 @@ namespace ConsoleApp.UI.Controls
             }
         }
         
-        public bool IsDropDownOpened
+        public bool IsDropDownOpened => null != menuDropDown;
+
+        protected bool OpenDropDown
         {
-            get => null != menuDropDown;
+            get;
+            set;
         }
 
         protected MenuOrientation Orientation
         {
             get;
         }
-        
-        public event EventHandler OnMenuCancel;
+
+        protected Menu ParentMenu
+        {
+            get;
+            set;
+        }
+
+        protected virtual Point MenuDropDownOffset => Point.Empty;
 
         public event EventHandler<MenuItemClickEventArgs> OnMenuItemClick;
 
         protected Menu(MenuOrientation orientation)
         {
             selectedIndex = -1;
+            OpenDropDown = false;
             Orientation = orientation;
+            ParentMenu = null;
             Items = new ItemsList<MenuElement>(OnItemsListChanged);
         }
 
@@ -148,32 +168,30 @@ namespace ConsoleApp.UI.Controls
         {
             if (Keys.Escape == key)
             {
-                RaiseMenuCancel(EventArgs.Empty);
+                OpenDropDown = false;
+                
+                if (null != ParentMenu)
+                {
+                    ParentMenu.DismissMenuDropDown(DismissReason.UserCancel);
+                }
+                else
+                {
+                    CancelMenu();
+                }
 
                 return true;
             }
 
             if (IsPreviousKey(key))
             {
-                var index = GetPreviousIndex();
-
-                SelectedIndex = index;
-                Invalidate();
+                SelectPreviousItem();
 
                 return true;
             }
 
             if (IsNextKey(key))
             {
-                var index = GetNextIndex();
-
-                SelectedIndex = index;
-                Invalidate();
-
-                if (IsDropDownOpened && SelectedItem is MenuItem menuItem)
-                {
-                    ShowMenuDropDown(menuItem);
-                }
+                SelectNextItem();
 
                 return true;
             }
@@ -182,6 +200,7 @@ namespace ConsoleApp.UI.Controls
             {
                 if (SelectedItem is MenuItem menuItem && 0 < menuItem.Items.Count && false == IsDropDownOpened)
                 {
+                    OpenDropDown = true;
                     ShowMenuDropDown(menuItem);
 
                     return true;
@@ -196,6 +215,7 @@ namespace ConsoleApp.UI.Controls
                 {
                     if (0 < menuItem.Items.Count && false == IsDropDownOpened)
                     {
+                        OpenDropDown = true;
                         ShowMenuDropDown(menuItem);
 
                         return true;
@@ -207,23 +227,37 @@ namespace ConsoleApp.UI.Controls
                 return true;
             }
 
+            if (Char.IsLetterOrDigit(key.Character) && modificators.IsEmpty)
+            {
+                for (int index = 0; index < Items.Count; index++)
+                {
+                    var menuElement = Items[index];
+
+                    if (false == (menuElement.IsVisible && menuElement.IsEnabled))
+                    {
+                        continue;
+                    }
+
+                    if (menuElement is MenuItem menuItem)
+                    {
+
+                    }
+                }
+            }
+
             return false;
         }
 
-        internal void NotifyOnClick(MenuItem menuItem)
+        internal void MenuItemClick(MenuItem menuItem)
         {
             if (null == menuItem || false == ReferenceEquals(menuItem.Menu, this))
             {
                 return;
             }
 
-            if (IsDropDownOpened)
-            {
-                DismissMenuDropDown();
-            }
-            
-            RaiseMenuCancel(EventArgs.Empty);
+            DismissMenuDropDown(DismissReason.ItemClick);
             RaiseOnMenuItemClick(new MenuItemClickEventArgs(menuItem));
+            CancelMenu();
         }
 
         protected override void RenderMain(ICellSurface surface, TimeSpan elapsed)
@@ -242,6 +276,37 @@ namespace ConsoleApp.UI.Controls
                 );
                 RenderMenuItems(surface, bounds, elapsed);
             }
+        }
+
+        protected void SelectPreviousItem()
+        {
+            var index = GetPreviousIndex();
+
+            SelectedIndex = index;
+            Invalidate();
+
+            if (OpenDropDown && SelectedItem is MenuItem menuItem && 0 < menuItem.Items.Count)
+            {
+                ShowMenuDropDown(menuItem);
+            }
+        }
+
+        protected void SelectNextItem()
+        {
+            var index = GetNextIndex();
+
+            SelectedIndex = index;
+            Invalidate();
+
+            if (OpenDropDown && SelectedItem is MenuItem menuItem && 0 < menuItem.Items.Count)
+            {
+                ShowMenuDropDown(menuItem);
+            }
+        }
+
+        protected virtual void CancelMenu()
+        {
+            ;
         }
 
         protected abstract void RenderMenuItems(ICellSurface surface, System.Drawing.Rectangle bounds, TimeSpan elapsed);
@@ -352,16 +417,6 @@ namespace ConsoleApp.UI.Controls
                 }
             }
         }
-        
-        protected void RaiseMenuCancel(EventArgs e)
-        {
-            var handler = OnMenuCancel;
-
-            if (null != handler)
-            {
-                handler.Invoke(this, e);
-            }
-        }
 
         protected void RaiseOnMenuItemClick(MenuItemClickEventArgs e)
         {
@@ -373,18 +428,65 @@ namespace ConsoleApp.UI.Controls
             }
         }
 
-        protected void DismissMenuDropDown()
+        internal void DismissMenuDropDown(DismissReason reason)
         {
-            var application = ConsoleApplication.Instance;
-            var dialogManager = application.DialogManager;
+            if (IsDropDownOpened)
+            {
+                var application = ConsoleApplication.Instance;
+                var dialogManager = application.DialogManager;
 
-            menuDropDown.MenuList.OnMenuCancel -= OnMenuDismiss;
+                dialogManager.Dismiss(menuDropDown);
+                
+                menuDropDown = null;
+            }
 
-            dialogManager.Dismiss(menuDropDown);
+            if (reason != DismissReason.MoveNext && reason != DismissReason.MovePrevious)
+            {
+                OpenDropDown = false;
+            }
+            
+            switch (reason)
+            {
+                case DismissReason.UserCancel:
+                {
+                    Focus();
+                    break;
+                }
 
-            menuDropDown = null;
+                case DismissReason.MovePrevious:
+                {
+                    SelectPreviousItem();
+                    break;
+                }
 
-            Focus();
+                case DismissReason.MoveNext:
+                {
+                    SelectNextItem();
+                    break;
+                }
+
+                case DismissReason.ItemClick:
+                {
+                    /*var menu = ParentMenu;
+
+                    while (null != menu)
+                    {
+                        menu.DismissMenuDropDown(reason);
+                        menu = menu.ParentMenu;
+                    }*/
+
+                    if (null != ParentMenu)
+                    {
+                        ParentMenu.DismissMenuDropDown(reason);
+                    }
+                    else
+                    {
+                        CancelMenu();
+                    }
+
+                    break;
+                }
+            }
         }
 
         protected void ShowMenuDropDown(MenuItem menuItem)
@@ -392,13 +494,21 @@ namespace ConsoleApp.UI.Controls
             var application = ConsoleApplication.Instance;
             var dialogManager = application.DialogManager;
 
-            var anchor = new System.Drawing.Rectangle(2, 0, menuItem.TitleLength, 1);
+            var anchor = MakeAbsolute(GetMenuItemBounds(menuItem));
 
-            menuDropDown = MenuDropDown.Create(anchor, menuItem.Items);
-            menuDropDown.MenuList.OnMenuCancel += OnMenuDismiss;
+            anchor.Offset(MenuDropDownOffset);
+
+            menuDropDown = MenuDropDown.Create(anchor);
+            menuDropDown.MenuList.ParentMenu = this;
+            for (var index = 0; index < menuItem.Items.Count; index++)
+            {
+                menuDropDown.MenuList.Items.Add(menuItem.Items[index]);
+            }
 
             dialogManager.ShowModal(menuDropDown);
         }
+
+        protected abstract System.Drawing.Rectangle GetMenuItemBounds(MenuItem menuItem);
 
         protected virtual void OnDisabledColorChanged()
         {
@@ -459,11 +569,6 @@ namespace ConsoleApp.UI.Controls
         private bool IsDropDownKey(AsciiKey key)
         {
             return MenuOrientation.Horizontal == Orientation && Keys.Down == key;
-        }
-
-        private void OnMenuDismiss(object sender, EventArgs e)
-        {
-            DismissMenuDropDown();
         }
 
         private static void OnHintColorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)

@@ -13,6 +13,8 @@ namespace ConsoleApp.UI
         public const char Colon = ':';
 
         public const char Filler0 = '\xB1';
+
+        public const char DirectionRight = '\x10';
     }
 
     public class WindowFrame

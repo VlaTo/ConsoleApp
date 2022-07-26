@@ -3,11 +3,15 @@ using SadConsole;
 using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 
 namespace ConsoleApp.UI.Controls
 {
     public class MenuItem : MenuElement
     {
+        public static readonly BindableProperty CommandProperty;
+        public static readonly BindableProperty CommandParameterProperty;
+        public static readonly BindableProperty ShortCutProperty;
         public static readonly BindableProperty TitleProperty;
 
         public string Title
@@ -16,14 +20,30 @@ namespace ConsoleApp.UI.Controls
             set => SetValue(TitleProperty, value);
         }
 
+        public ShortCut ShortCut
+        {
+            get => (ShortCut)GetValue(ShortCutProperty);
+            set => SetValue(ShortCutProperty, value);
+        }
 
+        public ICommand Command
+        {
+            get => (ICommand)GetValue(CommandProperty);
+            set => SetValue(CommandProperty, value);
+        }
+
+        public object CommandParameter
+        {
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
+        }
 
         public IList<MenuElement> Items
         {
             get;
         }
 
-        public override bool IsSelectable => IsVisible && IsEnabled;
+        public override bool IsSelectable => IsVisible && Enabled();
 
         public int TitleLength
         {
@@ -47,6 +67,22 @@ namespace ConsoleApp.UI.Controls
             }
         }
 
+        public int Width
+        {
+            get
+            {
+                var length = TitleLength;
+
+                if (null != ShortCut)
+                {
+                    var hint = ShortCut.Hint;
+                    length += (2 + hint.Length);
+                }
+
+                return length;
+            }
+        }
+
         public event EventHandler OnClick;
 
         public MenuItem()
@@ -56,16 +92,35 @@ namespace ConsoleApp.UI.Controls
 
         static MenuItem()
         {
+            CommandProperty = BindableProperty.Create(
+                nameof(Command),
+                typeof(ICommand),
+                ownerType: typeof(MenuItem),
+                defaultValue: null
+            );
+            CommandParameterProperty = BindableProperty.Create(
+                nameof(CommandParameter),
+                typeof(object),
+                ownerType: typeof(MenuItem),
+                defaultValue: null
+            );
+            ShortCutProperty = BindableProperty.Create(
+                nameof(ShortCut),
+                typeof(ShortCut),
+                ownerType: typeof(MenuItem),
+                defaultValue: null,
+                propertyChanged: OnShortCutPropertyChanged
+            );
             TitleProperty = BindableProperty.Create(
                 nameof(Title),
                 typeof(string),
-                typeof(MenuItem),
-                string.Empty,
-                OnTitlePropertyChanged
+                ownerType: typeof(MenuItem),
+                defaultValue: null,
+                propertyChanged: OnTitlePropertyChanged
             );
         }
 
-        public override void Render(ICellSurface surface, Rectangle rectangle, bool isSelected)
+        public override void Render(ICellSurface surface, Rectangle rectangle, bool isSelected, bool renderGlyph)
         {
             var left = rectangle.X + 2;
             var title = Title;
@@ -87,6 +142,18 @@ namespace ConsoleApp.UI.Controls
             {
                 surface.SetForeground(left + hintIndex, rectangle.Y, Menu.HintColor);
             }
+
+            if (renderGlyph && 0 < Items.Count)
+            {
+                left = rectangle.Width - 3;
+                surface.SetGlyph(left, rectangle.Y, Glyphs.DirectionRight, foreground);
+            }
+            else if (null != ShortCut)
+            {
+                var shortcut = ShortCut.Hint;
+                left = rectangle.Width - (shortcut.Length + 2);
+                surface.Print(left, rectangle.Y, shortcut, foreground);
+            }
         }
 
         public void Click()
@@ -96,40 +163,25 @@ namespace ConsoleApp.UI.Controls
                 return;
             }
 
-            if (null != Menu)
+            var command = Command;
+
+            if (null != command)
             {
-                Menu.NotifyOnClick(this);
+                var parameter = CommandParameter;
+
+                if (command.CanExecute(parameter))
+                {
+                    command.Execute(parameter);
+                }
             }
 
             RaiseOnClick();
+
+            if (null != Menu)
+            {
+                Menu.MenuItemClick(this);
+            }
         }
-
-        /*public override System.Drawing.Rectangle GetBounds()
-        {
-            if (null != Menu && null == Parent)
-            {
-                return Menu.GetItemBounds(this);
-            }
-
-            return Parent.GetItemBounds(this);
-        }*/
-
-        /*public static int GetLength(string title)
-        {
-            if (string.IsNullOrEmpty(title))
-            {
-                return 0;
-            }
-
-            var length = title.Length;
-
-            if (title.Contains('~'))
-            {
-                length--;
-            }
-
-            return length;
-        }*/
 
         protected override void OnMenuChanged()
         {
@@ -139,14 +191,26 @@ namespace ConsoleApp.UI.Controls
             }
         }
 
-        private System.Drawing.Rectangle GetItemBounds(MenuItem menuItem)
+        protected Color GetForegroundColor(bool isSelected)
         {
-            for (var index = 0; index < Items.Count; index++)
+            if (Enabled())
             {
-                
+                return isSelected ? Menu.SelectionForeground : Menu.Foreground;
             }
 
-            return System.Drawing.Rectangle.Empty;
+            return Menu.DisabledColor;
+        }
+
+        private bool Enabled()
+        {
+            if (null == Command)
+            {
+                return IsEnabled;
+            }
+
+            var parameter = CommandParameter;
+
+            return IsEnabled && Command.CanExecute(parameter);
         }
 
         private void RaiseOnClick()
@@ -192,9 +256,30 @@ namespace ConsoleApp.UI.Controls
             }
         }
 
+        private void OnShortCutChanged()
+        {
+            if (null != Menu)
+            {
+                Menu.Invalidate();
+            }
+        }
+
+        private void OnTitleChanged()
+        {
+            if (null != Menu)
+            {
+                Menu.Invalidate();
+            }
+        }
+
+        private static void OnShortCutPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((MenuItem)sender).OnShortCutChanged();
+        }
+
         private static void OnTitlePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
         {
-            ;
+            ((MenuItem)sender).OnTitleChanged();
         }
     }
 }

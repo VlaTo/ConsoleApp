@@ -1,6 +1,7 @@
 ﻿using SadConsole;
 using SadConsole.Input;
 using System;
+using System.Drawing;
 using Keys = SadConsole.Input.Keys;
 using Rectangle = SadRogue.Primitives.Rectangle;
 
@@ -8,38 +9,24 @@ namespace ConsoleApp.UI.Controls
 {
     public class MenuBar : Menu
     {
+        private VisualElement backgroundElement;
+
         public MenuBar()
             : base(MenuOrientation.Horizontal)
         {
+            backgroundElement = null;
         }
 
-        /*public System.Drawing.Rectangle GetItemBounds(MenuElement menuElement)
+        protected override void CancelMenu()
         {
-            var origin = new Point(Padding.Left + 2, Padding.Top);
-            var height = Bounds.Height - Padding.VerticalThickness;
-
-            foreach (var item in Items)
+            if (null != backgroundElement)
             {
-                if (item is MenuItem menuItem)
-                {
-                    var length = MenuItem.GetLength(menuItem.Title) + 4;
-
-                    if (ReferenceEquals(item, menuItem))
-                    {
-                        return new System.Drawing.Rectangle(origin, new Size(length, height));
-                    }
-
-                    origin.X += length;
-                }
-                else if (item is MenuDelimiter)
-                {
-                    origin.X += 2;
-                }
+                backgroundElement.Focus();
+                backgroundElement = null;
             }
 
-            return System.Drawing.Rectangle.Empty;
-        }*/
-
+            base.CancelMenu();
+        }
 
         protected override void RenderMenuItems(ICellSurface surface, System.Drawing.Rectangle bounds, TimeSpan elapsed)
         {
@@ -59,11 +46,11 @@ namespace ConsoleApp.UI.Controls
 
                 if (item is MenuItem menuItem)
                 {
-                    var length = menuItem.TitleLength;
+                    var length = menuItem.Width;
 
-                    isSelected = (IsFocused || IsDropDownOpened) && ReferenceEquals(SelectedItem, item);
+                    isSelected = (IsFocused || OpenDropDown) && ReferenceEquals(SelectedItem, item);
                     rect = new Rectangle(left, top, length + 4, bounds.Height);
-                    left += (length + 4);
+                    left += rect.Width;
                 }
                 else if (item is MenuDelimiter)
                 {
@@ -71,14 +58,63 @@ namespace ConsoleApp.UI.Controls
                     left += 2;
                 }
 
-                item.Render(surface, rect, isSelected);
+                item.Render(surface, rect, isSelected, false);
             }
+        }
+
+        protected override System.Drawing.Rectangle GetMenuItemBounds(MenuItem menuItem)
+        {
+            var origin = new Point(Padding.Left + 2, Padding.Top);
+            var height = Bounds.Height - Padding.VerticalThickness;
+            
+            foreach (var item in Items)
+            {
+                if (false == item.IsVisible)
+                {
+                    continue;
+                }
+
+                if (item is MenuItem mi)
+                {
+                    var width = mi.Width + 4;
+
+                    if (ReferenceEquals(item, menuItem))
+                    {
+                        return new System.Drawing.Rectangle(origin, new Size(width, height));
+                    }
+
+                    origin.X += width;
+                }
+                else if (item is MenuDelimiter)
+                {
+                    origin.X += 2;
+                }
+            }
+
+            return System.Drawing.Rectangle.Empty;
         }
 
         public override bool HandleKeyDown(AsciiKey key, ModificatorKeys modificators)
         {
             if (Keys.F9 == key && modificators.IsEmpty && false == IsFocused)
             {
+                var element = Parent;
+
+                while (null != element)
+                {
+                    if (null == element.Parent)
+                    {
+                        if (element.FocusedElement is Layout layout)
+                        {
+                            backgroundElement = layout.FocusedElement;
+                        }
+
+                        break;
+                    }
+
+                    element = element.Parent;
+                }
+
                 Focus();
 
                 return true;

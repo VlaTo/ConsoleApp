@@ -72,17 +72,7 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
-        public abstract void Render(ICellSurface surface, Rectangle rectangle, bool isSelected);
-
-        protected Color GetForegroundColor(bool isSelected)
-        {
-            if (IsEnabled)
-            {
-                return isSelected ? Menu.SelectionForeground : Menu.Foreground;
-            }
-
-            return Menu.DisabledColor;
-        }
+        public abstract void Render(ICellSurface surface, Rectangle rectangle, bool isSelected, bool renderGlyph);
 
         protected virtual void OnIsEnabledChanged()
         {

@@ -89,7 +89,7 @@ namespace ConsoleApp.UI
 
             Screen.Children.Add(Container);
 
-            MenuBar.OnMenuCancel += DoMenuCancel;
+            // MenuBar.OnMenuCancel += DoMenuCancel;
             
             DialogManager = new DialogManager(screen);
             WindowManager = background.WindowManager;
@@ -108,9 +108,9 @@ namespace ConsoleApp.UI
             instance.Exit();
         }
 
-        protected virtual void DoMenuCancel(object sender, EventArgs e)
+        /*protected virtual void DoMenuCancel(object sender, EventArgs e)
         {
             background.Focus();
-        }
+        }*/
     }
 }

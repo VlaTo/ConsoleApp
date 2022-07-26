@@ -19,7 +19,7 @@ namespace ConsoleApp.UI.Controls
             Frame = new MenuDropDownFrame(this);
         }
 
-        public static MenuDropDown Create(Rectangle anchor, IList<MenuElement> menuElements)
+        public static MenuDropDown Create(Rectangle anchor)
         {
             var dropDown = new MenuDropDown
             {
@@ -46,11 +46,6 @@ namespace ConsoleApp.UI.Controls
                 Source = dropDown,
                 PropertyPath = new PropertyPath(nameof(Foreground))
             });
-
-            for (var index = 0; index < menuElements.Count; index++)
-            {
-                menuList.Items.Add(menuElements[index]);
-            }
 
             dropDown.Children.Add(menuList);
             dropDown.MenuList = menuList;

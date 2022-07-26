@@ -1,39 +1,24 @@
-﻿using System;
-using ConsoleApp.Controls;
+﻿using ConsoleApp.Controls;
 using ConsoleApp.UI;
 using ConsoleApp.UI.Controls;
 using SadRogue.Primitives;
+using System;
+using ConsoleApp.UI.Commands;
 
 namespace ConsoleApp
 {
     internal sealed class EntityTreeViewerApplication : ConsoleApplication
     {
         private readonly EntityTreeViewWindow window;
-        private readonly MenuItem connectMenuItem;
-        private readonly MenuItem exitMenuItem;
+        // private readonly MenuItem connectMenuItem;
+        // private readonly MenuItem exitMenuItem;
         private readonly BottomToolBar toolBar;
-        private MenuItem windowsMenuItem;
+        // private MenuItem windowsMenuItem;
 
         public EntityTreeViewerApplication(Screen screen)
             : base(screen)
         {
             screen.WindowTitle = "Entity Tree Viewer";
-
-            connectMenuItem = new MenuItem
-            {
-                Title = "~Connect to GameServer..."
-            };
-            exitMenuItem = new MenuItem
-            {
-                Title = "E~xit",
-            };
-            windowsMenuItem = new MenuItem
-            {
-                Title = "~Windows",
-            };
-
-            connectMenuItem.OnClick += DoConnect;
-            exitMenuItem.OnClick += DoExit;
 
             MenuBar.Items.Add(new MenuItem
             {
@@ -47,16 +32,78 @@ namespace ConsoleApp
                     new MenuItem
                     {
                         Title = "Open ~Dump...",
+                        ShortCut = new ShortCut(SadConsole.Input.Keys.F3)
+                    },
+                    new MenuItem
+                    {
+                        Title = "Open Recent",
+                        Items =
+                        {
+                            new MenuItem
+                            {
+                                Title = "~1. 10.171.11.23:23460",
+                            },
+                            new MenuItem
+                            {
+                                Title = "~2. 10.171.11.23:28460",
+                            },
+                            new MenuItem
+                            {
+                                Title = "~3. 10.171.11.23:53460",
+                            },
+                            new MenuItem
+                            {
+                                Title = "~4. 10.171.11.23:38460",
+                            }
+                        }
                     },
                     new MenuDelimiter(),
-                    connectMenuItem,
+                    new MenuItem
+                    {
+                        Title = "~Connect to GameServer...",
+                        ShortCut = new ShortCut(SadConsole.Input.Keys.F4, KeyModificator.LeftCtrl | KeyModificator.RightCtrl),
+                        Command = new DelegateCommand(DoConnect)
+                    },
                     new MenuItem
                     {
                         Title = "Di~sconnect",
                         IsEnabled = false
                     },
                     new MenuDelimiter(),
-                    exitMenuItem
+                    new MenuItem
+                    {
+                        Title = "E~xit",
+                        ShortCut = new ShortCut(SadConsole.Input.Keys.F10),
+                        Command = new DelegateCommand(DoExit, () => false)
+                    }
+                }
+            });
+            MenuBar.Items.Add(new MenuItem
+            {
+                Title = "~Macro",
+                Items =
+                {
+                    new MenuItem
+                    {
+                        Title = "~Execute macros...",
+                    },
+                    new MenuDelimiter(),
+                    new MenuItem
+                    {
+                        Title = "~1. Add All heroes",
+                    },
+                    new MenuItem
+                    {
+                        Title = "~2. Build City",
+                    },
+                    new MenuItem
+                    {
+                        Title = "~3. Collect rewards",
+                    },
+                    new MenuItem
+                    {
+                        Title = "~4. Power-up Catgirl",
+                    },
                 }
             });
             MenuBar.Items.Add(new MenuItem
@@ -69,13 +116,12 @@ namespace ConsoleApp
             });
             MenuBar.Items.Add(new MenuItem
             {
-                Title = "~Macro",
-                IsEnabled = false
+                Title = "~Windows",
             });
-            MenuBar.Items.Add(windowsMenuItem);
             MenuBar.Items.Add(new MenuItem
             {
-                Title = "T~ests"
+                Title = "T~ests",
+                IsEnabled = false
             });
 
             toolBar = new BottomToolBar
@@ -115,12 +161,12 @@ namespace ConsoleApp
             WindowManager.AddWindow(temp);
         }
 
-        private void DoConnect(object sender, EventArgs e)
+        private void DoConnect()
         {
             toolBar.Hint = "EntityTreeViewer, version: 0.1";
         }
 
-        private void DoExit(object sender, EventArgs e)
+        private void DoExit()
         {
             Exit();
         }

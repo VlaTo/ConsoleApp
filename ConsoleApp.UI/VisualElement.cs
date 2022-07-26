@@ -578,6 +578,19 @@ namespace ConsoleApp.UI
             IsMeasureValid = false;
         }
 
+        protected Rectangle MakeAbsolute(Rectangle rectangle)
+        {
+            var element = this;
+
+            while (null != element)
+            {
+                rectangle.Offset(element.Bounds.Location);
+                element = element.Parent;
+            }
+
+            return rectangle;
+        }
+
         /*protected virtual SizeRequest OnMeasure(in int widthConstraint, in int heightConstraint)
         {
             if (IsVisible)
