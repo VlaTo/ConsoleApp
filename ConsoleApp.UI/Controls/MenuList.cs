@@ -57,7 +57,7 @@ namespace ConsoleApp.UI.Controls
             {
                 if (null != ParentMenu)
                 {
-                    ParentMenu.DismissMenuDropDown(DismissReason.MoveNext);
+                    ParentMenu.DismissMenuDropDown(MenuDismissReason.MoveNext);
                 }
 
                 return true;
@@ -67,7 +67,7 @@ namespace ConsoleApp.UI.Controls
             {
                 if (null != ParentMenu)
                 {
-                    ParentMenu.DismissMenuDropDown(DismissReason.MovePrevious);
+                    ParentMenu.DismissMenuDropDown(MenuDismissReason.MovePrevious);
                 }
 
                 return true;

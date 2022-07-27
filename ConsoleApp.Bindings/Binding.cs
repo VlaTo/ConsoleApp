@@ -69,10 +69,26 @@ namespace ConsoleApp.Bindings
 
         }
 
-        public void TriggerSourceChanged(object value)
+        public void TriggerSourceChanged()
         {
-            var target = BindingTarget.Target;
-            target.SetValue(BindingTarget.TargetProperty, value);
+            var obj = GetBindingSource(out var propertyName);
+
+            if (null == obj)
+            {
+                throw new Exception();
+            }
+
+            var property = BindableProperty.FindProperty(obj.GetType(), propertyName);
+
+            if (null == property)
+            {
+                throw new Exception();
+            }
+
+            if (obj is BindableObject bindable)
+            {
+                OnSourceChanged(bindable, property);
+            }
         }
 
         internal void BindSource()
@@ -137,7 +153,8 @@ namespace ConsoleApp.Bindings
         private void OnSourceChanged(BindableObject sender, BindableProperty property)
         {
             var value = sender.GetValue(property);
-            TriggerSourceChanged(value);
+            var target = BindingTarget.Target;
+            target.SetValue(BindingTarget.TargetProperty, value);
         }
     }
 }

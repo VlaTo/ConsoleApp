@@ -16,11 +16,15 @@ namespace ConsoleApp.UI
 
         public const char DirectionRight = '\x10';
 
-        public const char Point0 = '*';
+        public const char Point0 = '\xFE';
 
         public const char SquareBracketLeft = '[';
         
         public const char SquareBracketRight = ']';
+
+        public const char Box0 = '\xDC';
+
+        public const char Box1 = '\xDF';
     }
 
     public class WindowFrame
@@ -71,7 +75,7 @@ namespace ConsoleApp.UI
             }
 
             var rectangle = Bounds.ToRectangle();
-            var foreground = Window.IsFocused ? Color.White : Color.DarkGray;
+            var foreground = Window.IsFocused ? Window.FrameActiveColor : Window.FrameInactiveColor;
             var border = new ColoredGlyph(foreground, Window.Background);
             var background = new ColoredGlyph(Color.Transparent, Window.Background);
             var connectedLineStyle = GetConnectedLineStyle(Window.FrameType);
@@ -94,8 +98,6 @@ namespace ConsoleApp.UI
             );
 
             surface.DrawBox(rectangle, options);
-
-            //surface.ConnectLines(connectedLineStyle, rectangle);
 
             if (String.IsNullOrEmpty(Window.Title))
             {

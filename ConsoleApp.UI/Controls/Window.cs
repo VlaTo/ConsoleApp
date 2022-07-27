@@ -3,6 +3,7 @@ using ConsoleApp.UI.Extensions;
 using SadConsole;
 using System;
 using System.Drawing;
+using Color = SadRogue.Primitives.Color;
 using Rectangle = SadRogue.Primitives.Rectangle;
 
 namespace ConsoleApp.UI.Controls
@@ -20,6 +21,8 @@ namespace ConsoleApp.UI.Controls
         public const float ShadowForegroundShadeFactor = 0.15f;
 
         public static readonly BindableProperty FrameTypeProperty;
+        public static readonly BindableProperty FrameActiveColorProperty;
+        public static readonly BindableProperty FrameInactiveColorProperty;
         public static readonly BindableProperty CanMoveProperty;
         public static readonly BindableProperty TitleProperty;
 
@@ -27,6 +30,18 @@ namespace ConsoleApp.UI.Controls
         {
             get => (WindowFrameType)GetValue(FrameTypeProperty);
             set => SetValue(FrameTypeProperty, value);
+        }
+
+        public Color FrameActiveColor
+        {
+            get => (Color)GetValue(FrameActiveColorProperty);
+            set => SetValue(FrameActiveColorProperty, value);
+        }
+
+        public Color FrameInactiveColor
+        {
+            get => (Color)GetValue(FrameInactiveColorProperty);
+            set => SetValue(FrameInactiveColorProperty, value);
         }
 
         public bool CanMove
@@ -67,6 +82,20 @@ namespace ConsoleApp.UI.Controls
                 ownerType: typeof(Window),
                 defaultValue: WindowFrameType.Thick,
                 propertyChanged: OnFrameTypePropertyChanged
+            );
+            FrameActiveColorProperty = BindableProperty.Create(
+                nameof(FrameActiveColor),
+                typeof(Color),
+                ownerType: typeof(Window),
+                defaultValue: Color.White,
+                propertyChanged: OnFrameActiveColorPropertyChanged
+            );
+            FrameInactiveColorProperty = BindableProperty.Create(
+                nameof(FrameInactiveColor),
+                typeof(Color),
+                ownerType: typeof(Window),
+                defaultValue: Color.DarkGray,
+                propertyChanged: OnFrameInactiveColorPropertyChanged
             );
             CanMoveProperty = BindableProperty.Create(
                 nameof(CanMove),
@@ -195,6 +224,16 @@ namespace ConsoleApp.UI.Controls
             ;
         }
 
+        protected virtual void OnFrameInactiveColorChanged()
+        {
+            ;
+        }
+
+        protected virtual void OnFrameActiveColorChanged()
+        {
+            ;
+        }
+
         protected virtual void OnCanMoveChanged()
         {
             ;
@@ -208,6 +247,16 @@ namespace ConsoleApp.UI.Controls
         private static void OnFrameTypePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
         {
             ((Window)sender).OnFrameTypeChanged();
+        }
+
+        private static void OnFrameInactiveColorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((Window)sender).OnFrameInactiveColorChanged();
+        }
+
+        private static void OnFrameActiveColorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((Window)sender).OnFrameActiveColorChanged();
         }
 
         private static void OnCanMovePropertyChanged(BindableObject sender, object newvalue, object oldvalue)

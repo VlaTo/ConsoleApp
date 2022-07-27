@@ -171,6 +171,11 @@ namespace ConsoleApp.UI.Controls
                 return;
             }
 
+            if (null != Menu)
+            {
+                Menu.MenuItemClick(this);
+            }
+
             var command = Command;
 
             if (null != command)
@@ -184,11 +189,6 @@ namespace ConsoleApp.UI.Controls
             }
 
             RaiseOnClick();
-
-            if (null != Menu)
-            {
-                Menu.MenuItemClick(this);
-            }
         }
 
         protected override void OnMenuChanged()

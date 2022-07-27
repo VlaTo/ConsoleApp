@@ -58,7 +58,18 @@ namespace ConsoleApp.UI
                     HorizontalAlignment = HorizontalAlignment.Stretch
                 };
 
-                Screen.Children.Add(overlay);
+                var application = ConsoleApplication.Instance;
+                var index = Screen.Children.IndexOf(application.Container);
+
+                if (0 > index)
+                {
+                    Screen.Children.Add(overlay);
+                }
+                else
+                {
+                    var position = index + 1;
+                    Screen.Children.Insert(position, overlay);
+                }
             }
 
             popups.Add(popup, new Handler(callback));

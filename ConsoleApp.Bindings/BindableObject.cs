@@ -73,6 +73,7 @@ namespace ConsoleApp.Bindings
             binding.BindSource();
 
             holder.Bindings.Add(binding);
+            binding.TriggerSourceChanged();
         }
 
         public object GetValue(BindableProperty property)

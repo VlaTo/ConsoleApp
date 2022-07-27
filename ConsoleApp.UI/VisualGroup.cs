@@ -334,7 +334,8 @@ namespace ConsoleApp.UI
         protected void LayoutChildren(int x, int y, int width, int height)
         {
             var size = LayoutManager.Measure(Children, width, height);
-            var bounds = new Rectangle(Padding.Left, Padding.Top, size.Width, size.Height);
+            // var bounds = new Rectangle(Padding.Left, Padding.Top, size.Width, size.Height);
+            var bounds = new Rectangle(Padding.Left, Padding.Top, width - Padding.HorizontalThickness, height - Padding.VerticalThickness);
             LayoutManager.Arrange(Children, bounds);
         }
 

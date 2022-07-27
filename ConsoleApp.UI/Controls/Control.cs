@@ -1,14 +1,20 @@
 ﻿using ConsoleApp.Bindings;
-using NVorbis.Ogg;
 using SadConsole.Input;
 
 namespace ConsoleApp.UI.Controls
 {
     public class Control : VisualElement
     {
+        public static readonly BindableProperty IsEnabledProperty;
         public static readonly BindableProperty TabStopProperty;
         public static readonly BindableProperty TabIndexProperty;
         public static readonly BindableProperty TabManagerProperty;
+
+        public bool IsEnabled
+        {
+            get => (bool)GetValue(IsEnabledProperty);
+            set => SetValue(IsEnabledProperty, value);
+        }
 
         public bool TabStop
         {
@@ -34,6 +40,13 @@ namespace ConsoleApp.UI.Controls
 
         static Control()
         {
+            IsEnabledProperty = BindableProperty.Create(
+                nameof(IsEnabled),
+                typeof(bool),
+                ownerType: typeof(Control),
+                defaultValue: true,
+                propertyChanged: OnIsEnabledPropertyChanged
+            );
             TabStopProperty = BindableProperty.Create(
                 nameof(TabStop),
                 typeof(bool),
@@ -89,6 +102,16 @@ namespace ConsoleApp.UI.Controls
             }
 
             return false;
+        }
+
+        protected virtual void OnIsEnabledChanged()
+        {
+            ;
+        }
+
+        private static void OnIsEnabledPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((Control)sender).OnIsEnabledChanged();
         }
     }
 }

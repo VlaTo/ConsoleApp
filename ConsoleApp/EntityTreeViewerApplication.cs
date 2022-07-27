@@ -169,7 +169,9 @@ namespace ConsoleApp
 
         private void DoConnect()
         {
-            //toolBar.Hint = "EntityTreeViewer, version: 0.1";
+            var dialog = MessageBox.Create();
+
+            dialog.ShowModal();
         }
 
         private void DoExit()

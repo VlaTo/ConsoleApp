@@ -27,7 +27,7 @@ namespace ConsoleApp.UI.Controls
         }
     }
 
-    internal enum DismissReason
+    internal enum MenuDismissReason
     {
         ItemClick,
         UserCancel,
@@ -172,7 +172,7 @@ namespace ConsoleApp.UI.Controls
                 
                 if (null != ParentMenu)
                 {
-                    ParentMenu.DismissMenuDropDown(DismissReason.UserCancel);
+                    ParentMenu.DismissMenuDropDown(MenuDismissReason.UserCancel);
                 }
                 else
                 {
@@ -260,7 +260,7 @@ namespace ConsoleApp.UI.Controls
                 return;
             }
 
-            DismissMenuDropDown(DismissReason.ItemClick);
+            DismissMenuDropDown(MenuDismissReason.ItemClick);
             RaiseOnMenuItemClick(new MenuItemClickEventArgs(menuItem));
             CancelMenu();
         }
@@ -433,7 +433,7 @@ namespace ConsoleApp.UI.Controls
             }
         }
 
-        internal void DismissMenuDropDown(DismissReason reason)
+        internal void DismissMenuDropDown(MenuDismissReason reason)
         {
             if (IsDropDownOpened)
             {
@@ -441,32 +441,32 @@ namespace ConsoleApp.UI.Controls
                 menuDropDown = null;
             }
 
-            if (reason != DismissReason.MoveNext && reason != DismissReason.MovePrevious)
+            if (reason != MenuDismissReason.MoveNext && reason != MenuDismissReason.MovePrevious)
             {
                 OpenDropDown = false;
             }
             
             switch (reason)
             {
-                case DismissReason.UserCancel:
+                case MenuDismissReason.UserCancel:
                 {
                     Focus();
                     break;
                 }
 
-                case DismissReason.MovePrevious:
+                case MenuDismissReason.MovePrevious:
                 {
                     SelectPreviousItem();
                     break;
                 }
 
-                case DismissReason.MoveNext:
+                case MenuDismissReason.MoveNext:
                 {
                     SelectNextItem();
                     break;
                 }
 
-                case DismissReason.ItemClick:
+                case MenuDismissReason.ItemClick:
                 {
                     /*var menu = ParentMenu;
 

@@ -78,7 +78,7 @@ namespace ConsoleApp.UI
                 Width = 8
             };
 
-            var topBar = new StackLayout
+            var header = new StackLayout
             {
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -86,16 +86,20 @@ namespace ConsoleApp.UI
                 Height = 1
             };
 
-            topBar.Children.Add(MenuBar);
-            topBar.Children.Add(time);
+            header.Children.Add(MenuBar);
+            header.Children.Add(time);
             
-            Container.Children.Add(topBar);
+            Container.Children.Add(header);
             Container.Children.Add(background);
 
             Screen.Children.Add(Container);
 
             PopupManager = new PopupManager(screen);
-            DialogManager = new DialogManager(screen);
+            DialogManager = new DialogManager(screen)
+            {
+                ForegroundShadeFactor = 0.15f,
+                BackgroundShadeFactor = 0.15f
+            };
             WindowManager = background.WindowManager;
         }
 

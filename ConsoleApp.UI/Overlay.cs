@@ -7,7 +7,14 @@ namespace ConsoleApp.UI
 {
     public class Overlay : VisualGroup
     {
+        public static readonly BindableProperty ForegroundShadeFactorProperty;
         public static readonly BindableProperty BackgroundShadeFactorProperty;
+
+        public float ForegroundShadeFactor
+        {
+            get => (float)GetValue(ForegroundShadeFactorProperty);
+            set => SetValue(ForegroundShadeFactorProperty, value);
+        }
 
         public float BackgroundShadeFactor
         {
@@ -23,6 +30,13 @@ namespace ConsoleApp.UI
 
         static Overlay()
         {
+            ForegroundShadeFactorProperty = BindableProperty.Create(
+                nameof(ForegroundShadeFactor),
+                typeof(float),
+                typeof(Overlay),
+                defaultValue: Single.NaN,
+                propertyChanged: OnForegroundShadeFactorPropertyChanged
+            );
             BackgroundShadeFactorProperty = BindableProperty.Create(
                 nameof(BackgroundShadeFactor),
                 typeof(float),
@@ -36,20 +50,29 @@ namespace ConsoleApp.UI
         {
             if (IsDirty || false == IsOpaque)
             {
-                var factor = BackgroundShadeFactor;
-
-                if (false == Single.IsNaN(factor))
-                {
-                    RenderSurface.Shade(RenderSurface.Area, backgroundFactor: factor);
-                }
+                RenderSurface.Shade(
+                    RenderSurface.Area,
+                    foregroundFactor: ForegroundShadeFactor,
+                    backgroundFactor: BackgroundShadeFactor
+                );
             }
 
             base.RenderMain(surface, elapsed);
         }
 
+        protected virtual void OnForegroundShadeFactorChanged()
+        {
+            Invalidate();
+        }
+
         protected virtual void OnBackgroundShadeFactorChanged()
         {
             Invalidate();
+        }
+
+        private static void OnForegroundShadeFactorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((Overlay)sender).OnForegroundShadeFactorChanged();
         }
 
         private static void OnBackgroundShadeFactorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
