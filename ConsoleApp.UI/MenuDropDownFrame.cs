@@ -11,15 +11,15 @@ namespace ConsoleApp.UI
         public static readonly int[] LineThick;
         public static readonly int[] LineNone;
 
-        public MenuDropDown DropDown
+        public MenuFlyout Flyout
         {
             get;
         }
 
-        public MenuDropDownFrame(MenuDropDown dropDown)
-            : base(dropDown)
+        public MenuDropDownFrame(MenuFlyout flyout)
+            : base(flyout)
         {
-            DropDown = dropDown;
+            Flyout = flyout;
         }
 
         static MenuDropDownFrame()
@@ -34,8 +34,8 @@ namespace ConsoleApp.UI
             base.Render(surface);
 
             var rectangle = Bounds;
-            var items = DropDown.MenuList.Items;
-            var top = rectangle.Y + DropDown.MenuList.Bounds.Top;
+            var items = Flyout.MenuList.Items;
+            var top = rectangle.Y + Flyout.MenuList.Bounds.Top;
             var line = GetLine();
 
             for (var index = 0; index < items.Count; index++)

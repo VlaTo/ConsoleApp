@@ -7,7 +7,7 @@ namespace ConsoleApp.Controls
     public class EntityTreeViewWindow : Window
     {
         //private readonly UI.Label textBox;
-        private readonly LoadingIndicator indicator;
+        private readonly ProgressBar indicator;
 
         public EntityTreeViewWindow()
         {
@@ -24,12 +24,13 @@ namespace ConsoleApp.Controls
                 Text = "Text"
             };*/
 
-            indicator = new LoadingIndicator
+            indicator = new ProgressBar
             {
                 Foreground = Color.White,
                 Background = Color.Transparent,
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top,
+                IsIndeterminate = true,
                 Left = 3,
                 Top = 2,
                 Width = 72,

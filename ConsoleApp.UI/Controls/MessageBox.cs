@@ -22,6 +22,34 @@ namespace ConsoleApp.UI.Controls
                 Height = 12
             };
 
+            var checkBox = new CheckBox
+            {
+                Background = Color.DarkGray,
+                Foreground = Color.Black,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Top = 2,
+                Left = 4,
+                Width = 22,
+                Height = 1,
+                IsTriState = false,
+                State = CheckBoxState.Checked,
+                Text = "Check box"
+            };
+
+            var entry = new Entry
+            {
+                Background = Color.DarkBlue,
+                Foreground = Color.White,
+                Text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top,
+                Top = 4,
+                Left = 4,
+                Width = 22,
+                Height = 1
+            };
+
             var cancelButton = new Button
             {
                 IsCancel = true,
@@ -43,6 +71,8 @@ namespace ConsoleApp.UI.Controls
                 Width = 9
             };
 
+            messageBox.Children.Add(checkBox);
+            messageBox.Children.Add(entry);
             messageBox.Children.Add(cancelButton);
             messageBox.Children.Add(okButton);
 

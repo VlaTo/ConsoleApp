@@ -116,8 +116,8 @@ namespace ConsoleApp.UI
                 widthConstraint -= Margin.HorizontalThickness;
                 heightConstraint -= Margin.VerticalThickness;
 
-                widthConstraint = ResolveConstraint(widthConstraint, Width, 0);
-                heightConstraint = ResolveConstraint(heightConstraint, Height, 0);
+                widthConstraint = ResolveConstraint(widthConstraint, Width);
+                heightConstraint = ResolveConstraint(heightConstraint, Height);
                 
                 var sizeWithoutMargins = LayoutManager.Measure(Children, widthConstraint, heightConstraint);
 
@@ -149,6 +149,7 @@ namespace ConsoleApp.UI
         public virtual void InvalidateLayout()
         {
             InvalidateMeasureInternal(InvalidateTrigger.LayoutChanged);
+            UpdateChildrenLayout();
         }
 
         public void FocusElement(VisualElement element)
@@ -227,10 +228,20 @@ namespace ConsoleApp.UI
             base.Leave();
         }
 
-        protected override void InvalidateMeasureInternal(InvalidateTrigger trigger)
+        internal override void InvalidateMeasureInternal(InvalidateTrigger trigger)
         {
             base.InvalidateMeasureInternal(trigger);
-            UpdateChildrenLayout();
+
+            if (InvalidateTrigger.LayoutChanged == trigger)
+            {
+                return;
+            }
+
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < Children.Count; index++)
+            {
+                Children[index].InvalidateMeasureInternal(trigger);
+            }
         }
 
         protected virtual bool ShouldLayoutChildren() => false == Bounds.IsEmpty && IsVisible && Children.Any();

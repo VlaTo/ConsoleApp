@@ -24,6 +24,7 @@ namespace ConsoleApp.UI.Controls
         public static readonly BindableProperty FrameActiveColorProperty;
         public static readonly BindableProperty FrameInactiveColorProperty;
         public static readonly BindableProperty CanMoveProperty;
+        public static readonly BindableProperty MinimalSizeProperty;
         public static readonly BindableProperty TitleProperty;
 
         public WindowFrameType FrameType
@@ -48,6 +49,12 @@ namespace ConsoleApp.UI.Controls
         {
             get => (bool)GetValue(CanMoveProperty);
             set => SetValue(CanMoveProperty, value);
+        }
+
+        public Size MinimalSize
+        {
+            get => (Size)GetValue(MinimalSizeProperty);
+            set => SetValue(MinimalSizeProperty, value);
         }
 
         public string Title
@@ -104,6 +111,13 @@ namespace ConsoleApp.UI.Controls
                 defaultValue: true,
                 propertyChanged: OnCanMovePropertyChanged
             );
+            MinimalSizeProperty = BindableProperty.Create(
+                nameof(MinimalSize),
+                propertyType: typeof(Size),
+                ownerType: typeof(Window),
+                defaultValue: new Size(8, 4),
+                propertyChanged: OnMinimalSizePropertyChanged
+            );
             TitleProperty = BindableProperty.Create(
                 nameof(Title),
                 propertyType: typeof(string),
@@ -116,16 +130,16 @@ namespace ConsoleApp.UI.Controls
         {
             if (false == IsMeasureValid)
             {
-                var thickness = Frame.Thickness;
+                var frame = Frame.Thickness;
 
                 widthConstraint -= Margin.HorizontalThickness;
                 heightConstraint -= Margin.VerticalThickness;
 
-                widthConstraint = ResolveConstraint(widthConstraint, Width, Shadow.Width);
-                heightConstraint = ResolveConstraint(heightConstraint, Height, Shadow.Height);
+                widthConstraint = ResolveWidth(widthConstraint);
+                heightConstraint = ResolveHeight(heightConstraint);
 
-                var width = widthConstraint - thickness.HorizontalThickness;
-                var height = heightConstraint - thickness.VerticalThickness;
+                var width = widthConstraint - frame.HorizontalThickness;
+                var height = heightConstraint - frame.VerticalThickness;
                 var childrenSize = LayoutManager.Measure(Children, width, height);
 
                 DesiredSize = new Size(
@@ -214,6 +228,26 @@ namespace ConsoleApp.UI.Controls
 
             IsDirty = false;
         }
+        
+        protected virtual int ResolveHeight(int constraint)
+        {
+            if (0 > Height)
+            {
+                return Math.Max(constraint, MinimalSize.Height);
+            }
+
+            return Math.Max(Height, MinimalSize.Height) + Shadow.Height;
+        }
+        
+        protected virtual int ResolveWidth(int constraint)
+        {
+            if (0 > Width)
+            {
+                return Math.Max(constraint, MinimalSize.Width);
+            }
+
+            return Math.Max(Width, MinimalSize.Width) + Shadow.Width;
+        }
 
         protected override void OnChildAdded(VisualElement view)
         {
@@ -235,6 +269,11 @@ namespace ConsoleApp.UI.Controls
         }
 
         protected virtual void OnCanMoveChanged()
+        {
+            ;
+        }
+
+        protected virtual void OnMinimalSizeChanged()
         {
             ;
         }
@@ -262,6 +301,11 @@ namespace ConsoleApp.UI.Controls
         private static void OnCanMovePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
         {
             ((Window)sender).OnCanMoveChanged();
+        }
+
+        private static void OnMinimalSizePropertyChanged(BindableObject sender, object newvalue, object oldvalue)
+        {
+            ((Window)sender).OnMinimalSizeChanged();
         }
 
         private static void OnTitlePropertyChanged(object sender, object newValue, object oldValue)

@@ -164,7 +164,6 @@ namespace ConsoleApp
             WindowManager.AddWindow(temp);
 
             toolBar.Hint = "EntityTreeViewer, version: 0.1";
-
         }
 
         private void DoConnect()

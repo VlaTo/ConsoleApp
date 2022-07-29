@@ -452,6 +452,20 @@ namespace ConsoleApp.UI
             return position;
         }
 
+        internal virtual void InvalidateMeasureInternal(InvalidateTrigger trigger)
+        {
+            if (InvalidateTrigger.MeasureChanged == trigger)
+            {
+                IsMeasureValid = false;
+                IsArrangeValid = false;
+            }
+
+            if (InvalidateTrigger.LayoutChanged == trigger)
+            {
+                IsArrangeValid = false;
+            }
+        }
+
         protected Rectangle GetAvailableBounds(Rectangle bounds)
         {
             var left = CalculateLeft(bounds.X, bounds.Width);
@@ -553,8 +567,8 @@ namespace ConsoleApp.UI
             heightConstraint -= Margin.VerticalThickness;
 
             // Determine whether the external constraints or the requested size values will determine the measurements
-            widthConstraint = ResolveConstraint(widthConstraint, Width, 0);
-            heightConstraint = ResolveConstraint(heightConstraint, Height, 0);
+            widthConstraint = ResolveConstraint(widthConstraint, Width);
+            heightConstraint = ResolveConstraint(heightConstraint, Height);
             
             // Ask the handler to do the actual measuring								
             //var measureWithMargins = frameworkElement.Handler.GetDesiredSize(widthConstraint, heightConstraint);
@@ -572,10 +586,17 @@ namespace ConsoleApp.UI
             //return new Size(widthConstraint, heightConstraint);
         }
 
-        protected virtual void InvalidateMeasureInternal(InvalidateTrigger trigger)
+        protected Point MakeAbsolute(Point point)
         {
-            IsArrangeValid = false;
-            IsMeasureValid = false;
+            var element = this;
+
+            while (null != element)
+            {
+                point.Offset(element.Bounds.Location);
+                element = element.Parent;
+            }
+
+            return point;
         }
 
         protected Rectangle MakeAbsolute(Rectangle rectangle)
@@ -757,14 +778,14 @@ namespace ConsoleApp.UI
             return req;
         }*/
 
-        protected int ResolveConstraint(int value, int constraint, int extent)
+        protected int ResolveConstraint(int value, int constraint)
         {
             if (0 > constraint)
             {
                 return value;
             }
 
-            return Math.Min(value, constraint + extent);
+            return Math.Min(value, constraint);
         }
 
         protected virtual void PreRender(ICellSurface surface)

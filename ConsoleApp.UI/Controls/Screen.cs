@@ -3,6 +3,7 @@ using SadConsole;
 using SadConsole.Components;
 using SadConsole.Input;
 using System;
+using SadRogue.Primitives;
 using Settings = SadConsole.Settings;
 
 namespace ConsoleApp.UI.Controls
@@ -21,6 +22,12 @@ namespace ConsoleApp.UI.Controls
         }
 
         public bool IsRunning
+        {
+            get;
+            private set;
+        }
+
+        public Cursor Cursor
         {
             get;
             private set;
@@ -83,6 +90,8 @@ namespace ConsoleApp.UI.Controls
             console = new SadConsole.Console(Width, Height);
             container = new RootConsole(console, Render, Update);
 
+            Cursor = console.Cursor;
+
             var keyboardComponent = new KeyboardHandlerComponent(this);
             var mouseComponent = new MouseHandlerComponent(this);
 
@@ -93,6 +102,7 @@ namespace ConsoleApp.UI.Controls
             Settings.ResizeMode = Settings.WindowResizeOptions.None;
 
             Game.Instance.Screen = container;
+            //Game.Instance.Screen = console;
             Game.Instance.DestroyDefaultStartingConsole();
             Game.Instance.MonoGameInstance.WindowResized += OnResizeConsole;
 
@@ -160,26 +170,41 @@ namespace ConsoleApp.UI.Controls
             handled = false;
         }
 
+        private void Resize()
+        {
+            if (false == IsRunning)
+            {
+                return;
+            }
+
+            InvalidateMeasureInternal(InvalidateTrigger.MeasureChanged);
+
+            var size = Measure(Width, Height);
+            var bounds = new System.Drawing.Rectangle(System.Drawing.Point.Empty, size);
+
+            Arrange(bounds);
+            UpdateChildrenLayout();
+        }
+
         private void UpdateWindowTitle()
         {
             if (HasValue(WindowTitleProperty))
             {
-                SadConsole.Game.Instance.MonoGameInstance.Window.Title = WindowTitle;
+                Game.Instance.MonoGameInstance.Window.Title = WindowTitle;
             }
         }
 
         private void OnResizeConsole(object sender, EventArgs e)
         {
-            var width = SadConsole.Game.Instance.MonoGameInstance.WindowWidth / console.FontSize.X;
-            var height = SadConsole.Game.Instance.MonoGameInstance.WindowHeight / console.FontSize.Y;
+            var width = Game.Instance.MonoGameInstance.WindowWidth / console.FontSize.X;
+            var height = Game.Instance.MonoGameInstance.WindowHeight / console.FontSize.Y;
 
             console.Resize(width, height, width, height, true);
 
             Width = width;
             Height = height;
 
-            //Measure(width, height);
-            UpdateChildrenLayout();
+            Resize();
         }
 
         private static void OnWindowTitlePropertyChanged(BindableObject sender, object newValue, object oldValue)

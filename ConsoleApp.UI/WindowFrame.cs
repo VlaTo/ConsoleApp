@@ -21,6 +21,10 @@ namespace ConsoleApp.UI
         public const char SquareBracketLeft = '[';
         
         public const char SquareBracketRight = ']';
+        
+        public const char CheckMark = 'x';
+
+        public const char Indeterminate = '-';
 
         public const char Box0 = '\xDC';
 

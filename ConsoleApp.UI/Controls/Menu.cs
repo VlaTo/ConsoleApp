@@ -43,7 +43,7 @@ namespace ConsoleApp.UI.Controls
         public static readonly BindableProperty DisabledColorProperty;
         
         private int selectedIndex;
-        private MenuDropDown menuDropDown;
+        private MenuFlyout menuFlyout;
 
         public Color SelectionBackground
         {
@@ -100,7 +100,7 @@ namespace ConsoleApp.UI.Controls
             }
         }
         
-        public bool IsDropDownOpened => null != menuDropDown;
+        public bool IsDropDownOpened => null != menuFlyout;
 
         protected bool OpenDropDown
         {
@@ -437,8 +437,8 @@ namespace ConsoleApp.UI.Controls
         {
             if (IsDropDownOpened)
             {
-                menuDropDown.Dismiss();
-                menuDropDown = null;
+                menuFlyout.Dismiss();
+                menuFlyout = null;
             }
 
             if (reason != MenuDismissReason.MoveNext && reason != MenuDismissReason.MovePrevious)
@@ -496,14 +496,14 @@ namespace ConsoleApp.UI.Controls
 
             anchor.Offset(MenuDropDownOffset);
 
-            menuDropDown = MenuDropDown.Create(anchor);
-            menuDropDown.MenuList.ParentMenu = this;
+            menuFlyout = MenuFlyout.Create(anchor);
+            menuFlyout.MenuList.ParentMenu = this;
             for (var index = 0; index < menuItem.Items.Count; index++)
             {
-                menuDropDown.MenuList.Items.Add(menuItem.Items[index]);
+                menuFlyout.MenuList.Items.Add(menuItem.Items[index]);
             }
 
-            menuDropDown.Show();
+            menuFlyout.Show();
         }
 
         protected abstract System.Drawing.Rectangle GetMenuItemBounds(MenuItem menuItem);
