@@ -17,7 +17,7 @@ namespace ConsoleApp.UI
         public static readonly BindableProperty ForegroundShadeFactorProperty;
         public static readonly BindableProperty BackgroundShadeFactorProperty;
 
-        private readonly Dictionary<Dialog, Handler> dialogs;
+        private readonly List<Handler> dialogs;
         private VisualElement focusedElement;
         private Overlay overlay;
         
@@ -42,13 +42,11 @@ namespace ConsoleApp.UI
         {
             get
             {
-                var keys = dialogs.Keys;
-                var array = new Dialog[keys.Count];
-                var index = 0;
+                var array = new Dialog[dialogs.Count];
 
-                foreach (var dialog in keys)
+                for (var index = 0; index < dialogs.Count; index++)
                 {
-                    array[index++] = dialog;
+                    array[index++] = dialogs[index].Dialog;
                 }
 
                 return array;
@@ -58,7 +56,7 @@ namespace ConsoleApp.UI
         public DialogManager(Screen screen)
         {
             Screen = screen;
-            dialogs = new Dictionary<Dialog, Handler>();
+            dialogs = new List<Handler>();
         }
 
         static DialogManager()
@@ -86,11 +84,11 @@ namespace ConsoleApp.UI
                 throw new ArgumentNullException(nameof(dialog));
             }
 
-            if (dialogs.ContainsKey(dialog))
+            if (-1 < FindIndex(dialog))
             {
                 throw new InvalidOperationException();
             }
-            
+
             if (null == overlay)
             {
                 overlay = new Overlay
@@ -131,7 +129,7 @@ namespace ConsoleApp.UI
                 Screen.Children.Add(overlay);
             }
 
-            dialogs.Add(dialog, new Handler(callback));
+            dialogs.Add(new Handler(dialog, callback));
             overlay.Children.Add(dialog);
         }
 
@@ -142,23 +140,45 @@ namespace ConsoleApp.UI
                 throw new ArgumentNullException(nameof(dialog));
             }
 
-            if (dialogs.Remove(dialog, out var handler))
+            var index = FindIndex(dialog);
+
+            if (0 > index)
             {
-                overlay.Children.Remove(dialog);
-
-                if (0 == dialogs.Count)
-                {
-                    Screen.Children.Remove(overlay);
-                    overlay = null;
-
-                    if (null != focusedElement)
-                    {
-                        focusedElement.Focus();
-                    }
-                }
-
-                handler.RaiseCallback(reason);
+                throw new InvalidOperationException();
             }
+
+            var handler = dialogs[index];
+
+            dialogs.RemoveAt(index);
+            overlay.Children.Remove(dialog);
+
+            if (0 == dialogs.Count)
+            {
+                Screen.Children.Remove(overlay);
+                overlay = null;
+
+                if (null != focusedElement)
+                {
+                    focusedElement.Focus();
+                }
+            }
+            else
+            {
+                dialog = dialogs[^1].Dialog;
+                dialog.Focus();
+            }
+
+            handler.RaiseCallback(reason);
+        }
+
+        public bool Contains(Dialog dialog)
+        {
+            if (null == dialog)
+            {
+                throw new ArgumentNullException(nameof(dialog));
+            }
+
+            return -1 > FindIndex(dialog);
         }
 
         protected virtual void OnForegroundShadeFactorChanged()
@@ -169,6 +189,19 @@ namespace ConsoleApp.UI
         protected virtual void OnBackgroundShadeFactorChanged()
         {
             ;
+        }
+        
+        private int FindIndex(Dialog dialog)
+        {
+            for (var index = 0; index < dialogs.Count; index++)
+            {
+                if (ReferenceEquals(dialogs[index].Dialog, dialog))
+                {
+                    return index;
+                }
+            }
+
+            return -1;
         }
 
         private static void OnForegroundShadeFactorPropertyChanged(BindableObject sender, object newvalue, object oldvalue)
@@ -185,10 +218,16 @@ namespace ConsoleApp.UI
 
         private sealed class Handler
         {
+            public Dialog Dialog
+            {
+                get;
+            }
+
             private readonly Action<DialogDismissReason> callback;
 
-            public Handler(Action<DialogDismissReason> callback)
+            public Handler(Dialog dialog, Action<DialogDismissReason> callback)
             {
+                Dialog = dialog;
                 this.callback = callback;
             }
 

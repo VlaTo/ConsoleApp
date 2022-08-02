@@ -1,4 +1,5 @@
 ﻿using ConsoleApp.Bindings;
+using ConsoleApp.UI.Extensions;
 using SadConsole.Input;
 
 namespace ConsoleApp.UI.Controls
@@ -67,7 +68,7 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
-        public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys)
         {
             if (Keys.Tab == key)
             {
@@ -78,7 +79,7 @@ namespace ConsoleApp.UI.Controls
                     return false;
                 }
 
-                if (modificators.IsEmpty)
+                if (0 == shiftKeys)
                 {
                     var control = manager.GetNextControl(this);
 
@@ -88,7 +89,7 @@ namespace ConsoleApp.UI.Controls
                     }
                 }
 
-                if (modificators.IsShiftPressed)
+                if (shiftKeys.HasShift())
                 {
                     var control = manager.GetPreviousControl(this);
 

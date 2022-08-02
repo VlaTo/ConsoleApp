@@ -3,6 +3,7 @@ using SadConsole;
 using SadConsole.Components;
 using SadConsole.Input;
 using System;
+using ConsoleApp.UI.Extensions;
 using SadRogue.Primitives;
 using Settings = SadConsole.Settings;
 
@@ -120,11 +121,12 @@ namespace ConsoleApp.UI.Controls
         {
             if (0 < keyboard.KeysDown.Count)
             {
-                var modificators = new ModificatorKeys(keyboard);
+                var shiftKeys = keyboard.ToShiftKeys();
 
                 for (var index = 0; index < keyboard.KeysDown.Count; index++)
                 {
-                    if (HandleKeyDown(keyboard.KeysDown[index], modificators))
+                    var key = keyboard.KeysDown[index].Key;
+                    if (HandleKeyDown(key, shiftKeys))
                     {
                         handled = true;
                         return;
@@ -134,11 +136,12 @@ namespace ConsoleApp.UI.Controls
 
             if (0 < keyboard.KeysReleased.Count)
             {
-                var modificators = new ModificatorKeys(keyboard);
+                var shiftKeys = keyboard.ToShiftKeys();
 
                 for (var index = 0; index < keyboard.KeysReleased.Count; index++)
                 {
-                    if (HandleKeyUp(keyboard.KeysReleased[index], modificators))
+                    var key = keyboard.KeysReleased[index].Key;
+                    if (HandleKeyUp(key, shiftKeys))
                     {
                         handled = true;
                         return;
@@ -150,11 +153,12 @@ namespace ConsoleApp.UI.Controls
 
             if (0 < keyboard.KeysPressed.Count)
             {
-                var modificators = new ModificatorKeys(keyboard);
+                var shiftKeys = keyboard.ToShiftKeys();
 
                 for (var index = 0; index < keyboard.KeysPressed.Count; index++)
                 {
-                    if (HandleKeyPressed(keyboard.KeysPressed[index], modificators))
+                    var key = keyboard.KeysPressed[index].Key;
+                    if (HandleKeyPressed(key, shiftKeys))
                     {
                         handled = true;
                         break;

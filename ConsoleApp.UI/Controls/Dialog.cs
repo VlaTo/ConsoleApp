@@ -45,9 +45,9 @@ namespace ConsoleApp.UI.Controls
             DialogManager.Dismiss(this, reason);
         }
 
-        public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys)
         {
-            return HandleInteractionKeys(key, modificators) || base.HandleKeyPressed(key, modificators);
+            return HandleInteractionKeys(key, shiftKeys) || base.HandleKeyPressed(key, shiftKeys);
         }
 
         public override Size Measure(int widthConstraint, int heightConstraint)
@@ -60,9 +60,9 @@ namespace ConsoleApp.UI.Controls
             RaiseDismissed(new DialogDismissEventArgs(reason));
         }
 
-        private bool HandleInteractionKeys(AsciiKey key, ModificatorKeys modificators)
+        private bool HandleInteractionKeys(Keys key, ShiftKeys shiftKeys)
         {
-            if (Keys.Escape == key && modificators.IsEmpty)
+            if (Keys.Escape == key && 0 == shiftKeys)
             {
                 // ReSharper disable once ForCanBeConvertedToForeach
                 for (var index = 0; index < Children.Count; index++)
@@ -76,7 +76,7 @@ namespace ConsoleApp.UI.Controls
                 return true;
             }
 
-            if (Keys.Enter == key && modificators.IsEmpty)
+            if (Keys.Enter == key && 0 == shiftKeys)
             {
                 // ReSharper disable once ForCanBeConvertedToForeach
                 for (var index = 0; index < Children.Count; index++)

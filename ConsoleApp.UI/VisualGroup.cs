@@ -174,11 +174,11 @@ namespace ConsoleApp.UI
             }
         }
 
-        public override bool HandleKeyDown(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyDown(Keys key, ShiftKeys shiftKeys)
         {
             for (var index = 0; index < Children.Count; index++)
             {
-                if (Children[index].HandleKeyDown(key, modificators))
+                if (Children[index].HandleKeyDown(key, shiftKeys))
                 {
                     return true;
                 }
@@ -187,11 +187,11 @@ namespace ConsoleApp.UI
             return false;
         }
 
-        public override bool HandleKeyUp(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyUp(Keys key, ShiftKeys shiftKeys)
         {
             for (var index = 0; index < Children.Count; index++)
             {
-                if (Children[index].HandleKeyUp(key, modificators))
+                if (Children[index].HandleKeyUp(key, shiftKeys))
                 {
                     return true;
                 }
@@ -200,9 +200,9 @@ namespace ConsoleApp.UI
             return false;
         }
 
-        public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys)
         {
-            return null != FocusedElement && FocusedElement.HandleKeyPressed(key, modificators);
+            return null != FocusedElement && FocusedElement.HandleKeyPressed(key, shiftKeys);
         }
 
         public override void Enter()

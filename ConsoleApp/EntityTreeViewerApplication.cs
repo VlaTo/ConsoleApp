@@ -10,10 +10,7 @@ namespace ConsoleApp
     internal sealed class EntityTreeViewerApplication : ConsoleApplication
     {
         private readonly EntityTreeViewWindow window;
-        // private readonly MenuItem connectMenuItem;
-        // private readonly MenuItem exitMenuItem;
         private readonly BottomToolBar toolBar;
-        // private MenuItem windowsMenuItem;
 
         public EntityTreeViewerApplication(Screen screen)
             : base(screen)
@@ -61,7 +58,7 @@ namespace ConsoleApp
                     new MenuItem
                     {
                         Title = "~Connect to GameServer...",
-                        ShortCut = new ShortCut(SadConsole.Input.Keys.F4, KeyModificator.LeftCtrl | KeyModificator.RightCtrl),
+                        ShortCut = new ShortCut(SadConsole.Input.Keys.F5),
                         Command = new DelegateCommand(DoConnect)
                     },
                     new MenuItem

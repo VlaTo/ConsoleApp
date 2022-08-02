@@ -420,11 +420,11 @@ namespace ConsoleApp.UI
             Invalidate();
         }
 
-        public virtual bool HandleKeyDown(AsciiKey key, ModificatorKeys modificators) => false;
+        public virtual bool HandleKeyDown(Keys key, ShiftKeys shiftKeys) => false;
 
-        public virtual bool HandleKeyUp(AsciiKey key, ModificatorKeys modificators) => false;
+        public virtual bool HandleKeyUp(Keys key, ShiftKeys shiftKeys) => false;
 
-        public virtual bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators) => false;
+        public virtual bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys) => false;
 
         public void Focus()
         {
@@ -432,24 +432,6 @@ namespace ConsoleApp.UI
             {
                 Parent.FocusElement(this);
             }
-        }
-
-        public Point GetAbsolutePosition()
-        {
-            var position = Bounds.Location;
-            var element = Parent;
-
-            while (null != element)
-            {
-                var location = element.Bounds.Location;
-
-                position.X += location.X;
-                position.Y += location.Y;
-                //position = new Point(position.X + location.X, position.Y + location.Y);
-                element = element.Parent;
-            }
-
-            return position;
         }
 
         internal virtual void InvalidateMeasureInternal(InvalidateTrigger trigger)

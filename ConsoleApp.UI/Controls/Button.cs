@@ -73,7 +73,7 @@ namespace ConsoleApp.UI.Controls
             set => SetValue(TextProperty, value);
         }
 
-        public event EventHandler OnClick;
+        public event EventHandler Clicked;
 
         public Button()
         {
@@ -163,16 +163,16 @@ namespace ConsoleApp.UI.Controls
             RaiseOnClick(EventArgs.Empty);
         }
 
-        public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys)
         {
-            var handled = base.HandleKeyPressed(key, modificators);
+            var handled = base.HandleKeyPressed(key, shiftKeys);
 
             if (handled)
             {
                 return true;
             }
 
-            if (Keys.Space == key && modificators.IsEmpty)
+            if (Keys.Space == key && 0 == shiftKeys)
             {
                 Click();
 
@@ -264,7 +264,7 @@ namespace ConsoleApp.UI.Controls
 
         private void RaiseOnClick(EventArgs e)
         {
-            var handler = OnClick;
+            var handler = Clicked;
 
             if (null != handler)
             {

@@ -1,6 +1,6 @@
 ﻿using SadConsole;
-using SadConsole.Input;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using Keys = SadConsole.Input.Keys;
 using Rectangle = SadRogue.Primitives.Rectangle;
@@ -94,9 +94,9 @@ namespace ConsoleApp.UI.Controls
             return System.Drawing.Rectangle.Empty;
         }
 
-        public override bool HandleKeyDown(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyDown(Keys key, ShiftKeys shiftKeys)
         {
-            if (Keys.F9 == key && modificators.IsEmpty && false == IsFocused)
+            if (Keys.F9 == key && 0 == shiftKeys && false == IsFocused)
             {
                 var element = Parent;
 
@@ -120,7 +120,9 @@ namespace ConsoleApp.UI.Controls
                 return true;
             }
 
-            return false;
+            var shortCut = new ShortCut(key, shiftKeys);
+
+            return HandleShortCut(Items, shortCut);
         }
 
         protected override void OnItemsListChanged(ItemsList<MenuElement>.ItemsListChangedEventArgs args)
@@ -144,6 +146,35 @@ namespace ConsoleApp.UI.Controls
                     break;
                 }
             }
+        }
+
+        private static bool HandleShortCut(IList<MenuElement> menuElements, ShortCut shortCut)
+        {
+            for (var index = 0; index < menuElements.Count; index++)
+            {
+                var menuElement = menuElements[index];
+
+                if (false == (menuElement.IsEnabled && menuElement.IsVisible))
+                {
+                    continue;
+                }
+
+                if (menuElement is MenuItem menuItem)
+                {
+                    if (null != menuItem.ShortCut && menuItem.ShortCut.Equals(shortCut))
+                    {
+                        menuItem.Click();
+                        return true;
+                    }
+
+                    if (HandleShortCut(menuItem.Items, shortCut))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

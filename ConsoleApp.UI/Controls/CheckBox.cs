@@ -118,15 +118,15 @@ namespace ConsoleApp.UI.Controls
             surface.Print(rectangle.X + 4, rectangle.Y, Text, foreground: Foreground);
         }
 
-        public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys)
         {
-            if (Keys.Space == key && modificators.IsEmpty)
+            if (Keys.Space == key && 0 == shiftKeys)
             {
                 State = NextState(State);
                 return true;
             }
 
-            return base.HandleKeyPressed(key, modificators);
+            return base.HandleKeyPressed(key, shiftKeys);
         }
 
         protected virtual void OnIsTriStateChanged()

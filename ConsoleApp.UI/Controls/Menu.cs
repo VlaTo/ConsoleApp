@@ -4,6 +4,7 @@ using SadConsole.Input;
 using SadRogue.Primitives;
 using System;
 using System.Collections.Generic;
+using ConsoleApp.UI.Extensions;
 using Point = System.Drawing.Point;
 
 namespace ConsoleApp.UI.Controls
@@ -121,7 +122,7 @@ namespace ConsoleApp.UI.Controls
 
         protected virtual Point MenuDropDownOffset => Point.Empty;
 
-        public event EventHandler<MenuItemClickEventArgs> OnMenuItemClick;
+        public event EventHandler<MenuItemClickEventArgs> MenuItemClicked;
 
         protected Menu(MenuOrientation orientation)
         {
@@ -164,7 +165,7 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
-        public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys)
         {
             if (Keys.Escape == key)
             {
@@ -226,8 +227,10 @@ namespace ConsoleApp.UI.Controls
 
                 return true;
             }
+            
+            var asciiKey = AsciiKey.Get(key, shiftKeys.HasShift(), KeyboardState.Empty);
 
-            if (Char.IsLetterOrDigit(key.Character) && modificators.IsEmpty)
+            if (Char.IsLetterOrDigit(asciiKey.Character) && 0 == shiftKeys)
             {
                 for (var index = 0; index < Items.Count; index++)
                 {
@@ -238,7 +241,7 @@ namespace ConsoleApp.UI.Controls
                         continue;
                     }
 
-                    if (menuElement is MenuItem menuItem && menuItem.IsHotKey(key.Character))
+                    if (menuElement is MenuItem menuItem && menuItem.IsHotKey(asciiKey.Character))
                     {
                         SelectedIndex = index;
                         Invalidate();
@@ -425,7 +428,7 @@ namespace ConsoleApp.UI.Controls
 
         protected void RaiseOnMenuItemClick(MenuItemClickEventArgs e)
         {
-            var handler = OnMenuItemClick;
+            var handler = MenuItemClicked;
 
             if (null != handler)
             {
@@ -528,7 +531,7 @@ namespace ConsoleApp.UI.Controls
             ;
         }
 
-        private bool IsNextKey(AsciiKey key)
+        private bool IsNextKey(Keys key)
         {
             switch (Orientation)
             {
@@ -546,7 +549,7 @@ namespace ConsoleApp.UI.Controls
             return false;
         }
 
-        private bool IsPreviousKey(AsciiKey key)
+        private bool IsPreviousKey(Keys key)
         {
             switch (Orientation)
             {
@@ -564,7 +567,7 @@ namespace ConsoleApp.UI.Controls
             return false;
         }
 
-        private bool IsDropDownKey(AsciiKey key)
+        private bool IsDropDownKey(Keys key)
         {
             return MenuOrientation.Horizontal == Orientation && Keys.Down == key;
         }

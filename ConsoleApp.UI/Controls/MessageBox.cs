@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using ConsoleApp.UI.Commands;
 using SadRogue.Primitives;
 
@@ -76,12 +77,20 @@ namespace ConsoleApp.UI.Controls
             messageBox.Children.Add(cancelButton);
             messageBox.Children.Add(okButton);
 
+            entry.TextChanged += OnEntryTextChanged;
+
             return messageBox;
         }
 
         private void DoCancel()
         {
             Dismiss(DialogDismissReason.UserCancel);
+        }
+
+        private static void OnEntryTextChanged(object sender, EventArgs e)
+        {
+            var entry = (Entry)sender;
+            Debug.WriteLine($"[Entry] Text: \"{entry.Text}\"");
         }
     }
 }

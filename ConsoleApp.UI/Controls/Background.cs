@@ -1,4 +1,5 @@
 ﻿using ConsoleApp.Bindings;
+using ConsoleApp.UI.Extensions;
 using SadConsole;
 using SadConsole.Input;
 using Keys = SadConsole.Input.Keys;
@@ -38,14 +39,14 @@ namespace ConsoleApp.UI.Controls
             );
         }
 
-        public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys)
         {
             if (Keys.F6 == key)
             {
-                return WindowManager.FocusWindow(modificators.IsShiftPressed ? MoveDirection.Previous : MoveDirection.Next);
+                return WindowManager.FocusWindow(shiftKeys.HasShift() ? MoveDirection.Previous : MoveDirection.Next);
             }
 
-            return base.HandleKeyPressed(key, modificators);
+            return base.HandleKeyPressed(key, shiftKeys);
         }
 
         protected override void PreRender(ICellSurface surface)

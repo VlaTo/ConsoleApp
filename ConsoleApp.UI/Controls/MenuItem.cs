@@ -83,7 +83,7 @@ namespace ConsoleApp.UI.Controls
             }
         }
 
-        public event EventHandler OnClick;
+        public event EventHandler Clicked;
 
         public MenuItem()
         {
@@ -223,7 +223,7 @@ namespace ConsoleApp.UI.Controls
 
         private void RaiseOnClick()
         {
-            var handler = OnClick;
+            var handler = Clicked;
 
             if (null != handler)
             {

@@ -49,9 +49,9 @@ namespace ConsoleApp.UI.Controls
             return DesiredSize;
         }
 
-        public override bool HandleKeyPressed(AsciiKey key, ModificatorKeys modificators)
+        public override bool HandleKeyPressed(Keys key, ShiftKeys shiftKeys)
         {
-            var handled = base.HandleKeyPressed(key, modificators);
+            var handled = base.HandleKeyPressed(key, shiftKeys);
 
             if (Keys.Right == key && false == handled)
             {
